@@ -12,8 +12,8 @@ See [find_pacakge() -  config mode search procedure](https://cmake.org/cmake/hel
 Clone the repository and set the working directory
 
 ```bash
-git clone xxx
-cd xxx
+git clone https://github.com/Devil-Syntax-Tree/LLVM_sandbox
+cd LLVM_sandbox
 ```
 
 build the project
