@@ -1,0 +1,13 @@
+- para generación inicial
+    (en /workspaces/LLVM_sandbox)
+        cmake .
+    (otra opción)
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++
+        (preferible la primera)
+- para crear ejecutable
+    make
+    (otra opción)
+        cmake --build build/
+        (preferible la primera)
+- para ejecutar
+    ./sandbox_executable

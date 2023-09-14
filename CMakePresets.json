@@ -18,7 +18,7 @@
       }
     },
     {
-      "name": "x64-windows-base",
+      "name": "x64-linux-base",
       "inherits": "x64-base",
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
@@ -34,7 +34,7 @@
       "name": "x64-debug",
       "displayName": "x64 Debug",
       "hidden": false,
-      "inherits": "x64-windows-base",
+      "inherits": "x64-linux-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -42,12 +42,12 @@
     {
       "name": "x64-release",
       "displayName": "x64 Release",
-      "inherits": "x64-windows-base",
+      "inherits": "x64-linux-base",
       "hidden": false,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "LLVM_ROOT": "C:\\dev\\sdks\\LLVM-16.0.6-x64-windows-release"
+        "LLVM_ROOT": "/usr/lib/llvm-10"
       }
-    },
+    }
   ]
 }

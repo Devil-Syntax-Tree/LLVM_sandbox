@@ -1,5 +1,5 @@
-﻿cmake_minimum_required (
-    VERSION 3.22 
+cmake_minimum_required (
+    VERSION 3.22
 )
 
 project (
@@ -28,5 +28,7 @@ target_include_directories (sandbox_executable PRIVATE ${LLVM_INCLUDE_DIRS})
 
 # add compile definitions/ macros to sandbox
 target_compile_definitions (sandbox_executable PRIVATE ${LLVM_DEFINITIONS_LIST})
+
+target_include_directories (sandbox_executable PRIVATE sandbox)
 
 add_subdirectory (sandbox)
