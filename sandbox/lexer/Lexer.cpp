@@ -16,6 +16,7 @@ int Lexer::getToken() {
 
   while (lastCharacter == ' ') { // ignora espacios
     lastCharacter = reader();
+  }
 
   // reconocer identificadores -> [aA-zZ][aA-zZ0-9]*
   if (isalpha(lastCharacter)) { // isalpha() revisa si el primer carácter es letra (min o may)
@@ -43,8 +44,9 @@ int Lexer::getToken() {
     return TOK_EOF;
   }
 
+  // caso para símbolos extraños... realmente, esto no debería existir...
+  // en todo caso, retorna su código ASCII
   int thisCharacter = lastCharacter;
   lastCharacter = reader();
   return thisCharacter;
-}
 }
