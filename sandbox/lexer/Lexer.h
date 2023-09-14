@@ -5,12 +5,13 @@
 #include <fstream>
 #include <string>
 #include <lexer/Reader.h>
+#include <lexer/Token.h>
 
 class Lexer {
 public:
     Lexer(Reader &r);
     ~Lexer();
-    int getToken();
+    Token getToken();
 
 private:
     Reader& reader;

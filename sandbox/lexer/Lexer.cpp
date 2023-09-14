@@ -10,7 +10,7 @@ Lexer::Lexer(Reader &r) : reader(r) {}
 
 Lexer::~Lexer() {}
 
-int Lexer::getToken() {
+Token Lexer::getToken() {
   int lastCharacter = ' ';
 
   while (isspace(lastCharacter)) { // ignora espacios
@@ -26,73 +26,74 @@ int Lexer::getToken() {
     }
 
     if (identifierStr == "def") {
-      return TOK_DEF;
+      return { TokenType::TOK_DEF, identifierStr };
     }
     if (identifierStr == "extern") {
-      return TOK_EXTERN;
+      return { TokenType::TOK_EXTERN, identifierStr };
     }
     if (identifierStr == "if") {
-      return TOK_IF;
+      return { TokenType::TOK_IF, identifierStr };
     }
     if (identifierStr == "then") {
-      return TOK_THEN;
+      return { TokenType::TOK_THEN, identifierStr };
     }
     if (identifierStr == "else") {
-      return TOK_ELSE;
+      return { TokenType::TOK_ELSE, identifierStr };
     }
     
-    return TOK_ID;
+    return { TokenType::TOK_ID, identifierStr };
   }
   
   // reconocer números -> [0-9.]+
   if (isdigit(lastCharacter) || lastCharacter == '.') {
     std::string numStr;
+    numStr += lastCharacter;
     while (isdigit(reader.peekNextChar()) || reader.peekNextChar() == '.') {
-      numStr += lastCharacter;
       lastCharacter = reader.readChar();
+      numStr += lastCharacter;
     }
 
     valNum = strtod(numStr.c_str(), 0);
-    return TOK_NUMBER;
+    return { TokenType::TOK_NUMBER, numStr };
   }
 
   // reconocer símbolos
   if (lastCharacter == '=') {
-    return TOK_ASSIGN;
+    return { TokenType::TOK_ASSIGN, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '+') {
-    return TOK_SUM;
+    return { TokenType::TOK_SUM, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '-') {
-    return TOK_DIFF;
+    return { TokenType::TOK_DIFF, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '*') {
-    return TOK_MULT;
+    return { TokenType::TOK_MULT, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '/') {
-    return TOK_DIV;
+    return { TokenType::TOK_DIV, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '<') {
-    return TOK_LESS;
+    return { TokenType::TOK_LESS, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '>') {
-    return TOK_GREATER;
+    return { TokenType::TOK_GREATER, std::string(1, lastCharacter) };
   }
   if (lastCharacter == '(') {
-    return TOK_L_PAR;
+    return { TokenType::TOK_L_PAR, std::string(1, lastCharacter) };
   }
   if (lastCharacter == ')') {
-    return TOK_R_PAR;
+    return { TokenType::TOK_R_PAR, std::string(1, lastCharacter) };
   }
 
   // reconocer EOF
   if (lastCharacter == EOF) {
-    return TOK_EOF;
+    return { TokenType::TOK_EOF, "EOF" };
   }
 
   // caso para símbolos extraños... realmente, esto no debería existir...
   // en todo caso, retorna su código ASCII
-  int thisCharacter = lastCharacter;
+  //int thisCharacter = lastCharacter;
   lastCharacter = reader.readChar();
-  return thisCharacter;
+  return { TokenType::TOK_UNKNOWN, std::string(1, lastCharacter) };
 }

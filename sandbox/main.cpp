@@ -4,6 +4,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include <lexer/Reader.h>
 #include <lexer/Lexer.h>
+#include <lexer/Token.h>
 
 
 int main()
@@ -15,10 +16,10 @@ int main()
     //Lexer lexer([&reader]() { return reader.readChar(); });
     Lexer lexer(reader);
 
-    int tok = 0;
-    while (tok != -1) {
+    Token tok({ TokenType::TOK_INIT, "" });
+    while (tok.type != TokenType::TOK_EOF) {
         tok = lexer.getToken();
-        std::cout << "got " << tok << " as token" << std::endl;
+        std::cout << "got " << tok.value << " as token" << std::endl;
     }
 
     // llvm::LLVMContext context;
