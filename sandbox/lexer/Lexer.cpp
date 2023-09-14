@@ -6,7 +6,7 @@
 #include <lexer/Token.h>
 
 Lexer::Lexer(std::function<char()> r) : reader(r) {
-  //lastCharacter = reader(); // reader es leerChar() de la clase Reader
+  // reader es leerChar() de la clase Reader
 }
 
 Lexer::~Lexer() {}
@@ -27,6 +27,7 @@ int Lexer::getToken() {
 
     return TOK_ID;
   }
+  
   // reconocer números -> [0-9.]+
   if (isdigit(lastCharacter) || lastCharacter == '.') {
     std::string numStr;
