@@ -4,16 +4,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <lexer/Token.h>
+#include <lexer/Reader.h>
 
 class Lexer {
 public:
-    Lexer(std::function<char()> r);
+    Lexer(Reader &r);
     ~Lexer();
     int getToken();
 
 private:
-    std::function<int()> reader;
+    Reader& reader;
     int lastCharacter;
     std::string identifierStr;
     double valNum;

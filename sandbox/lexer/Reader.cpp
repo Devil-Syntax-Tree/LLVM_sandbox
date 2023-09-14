@@ -44,3 +44,22 @@ char Reader::readChar() {
 
     return '\0';
 }
+
+char Reader::peekNextChar() {
+    if (!file_.is_open()) {
+        std::cerr << "El archivo no está abierto." << std::endl;
+        throw std::runtime_error("File not found");
+    }
+
+    std::streampos currentPos = file_.tellg();  // Guarda la posición actual
+    char nextChar;
+    file_.seekg(0, std::ios::cur);  // Mueve el puntero una posición hacia adelante
+
+    if (file_.get(nextChar)) {
+        file_.seekg(currentPos);  // Regresa el puntero a su posición original
+        return nextChar;
+    } else {
+        file_.seekg(currentPos);  // Regresa el puntero a su posición original
+        return EOF;
+    }
+}

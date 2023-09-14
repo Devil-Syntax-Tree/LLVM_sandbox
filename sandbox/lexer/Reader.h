@@ -11,6 +11,7 @@ public:
     ~Reader();
     void readFile();
     char readChar();
+    char peekNextChar();
 
 private:
     std::string filename_;

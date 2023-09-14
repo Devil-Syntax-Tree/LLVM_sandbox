@@ -10,15 +10,16 @@ int main()
 {
     llvm::outs() << "Hello LLVM!!!\n\n";
 
-    Reader reader("gold_example.txt");
+    Reader reader("kaleidoscope_example.txt");
 
-    Lexer lexer([&reader]() { return reader.readChar(); });
+    //Lexer lexer([&reader]() { return reader.readChar(); });
+    Lexer lexer(reader);
 
     int tok = 0;
     while (tok != -1) {
         tok = lexer.getToken();
         std::cout << "got " << tok << " as token" << std::endl;
-    }    
+    }
 
     // llvm::LLVMContext context;
     // llvm::IRBuilder<> irBuilder(context);
