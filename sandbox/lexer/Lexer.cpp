@@ -8,8 +8,6 @@
 
 Lexer::Lexer(Reader &r) : reader(r) {}
 
-Lexer::~Lexer() {}
-
 Token Lexer::getToken() {
   int lastCharacter = ' ';
 

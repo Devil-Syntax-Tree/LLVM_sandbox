@@ -10,7 +10,7 @@
 class Lexer {
 public:
     Lexer(Reader &r);
-    ~Lexer();
+    ~Lexer() = default;
     Token getToken();
 
 private:
