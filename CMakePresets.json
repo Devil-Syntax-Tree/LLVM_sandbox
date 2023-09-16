@@ -1,4 +1,4 @@
-﻿{
+{
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
@@ -37,7 +37,8 @@
       "hidden": false,
       "inherits": "x64-windows-base",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "LLVM_ROOT": ""
       }
     },
     {
@@ -47,8 +48,42 @@
       "hidden": false,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "LLVM_ROOT": "C:\\dev\\sdks\\LLVM-16.0.6-x64-windows-release"
+        "LLVM_ROOT": ""
       }
     },
+    {
+      "name": "x64-linux-base",
+      "inherits": "x64-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "x64-linux-debug",
+      "displayName": "x64 Debug",
+      "hidden": false,
+      "inherits": "x64-linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "LLVM_ROOT": ""
+      }
+    },
+    {
+      "name": "x64-linux-debug",
+      "displayName": "x64 Debug",
+      "hidden": false,
+      "inherits": "x64-linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "LLVM_ROOT": ""
+      }
+    }
   ]
 }
