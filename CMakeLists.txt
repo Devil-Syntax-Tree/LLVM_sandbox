@@ -32,3 +32,6 @@ target_compile_definitions (sandbox_executable PRIVATE ${LLVM_DEFINITIONS_LIST})
 target_include_directories (sandbox_executable PRIVATE sandbox)
 
 add_subdirectory (sandbox)
+
+# kaleidoscope implementation
+add_subdirectory(kaleidoscope)
