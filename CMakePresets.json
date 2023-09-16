@@ -20,6 +20,7 @@
     {
       "name": "x64-windows-base",
       "inherits": "x64-base",
+      "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER": "cl.exe"
