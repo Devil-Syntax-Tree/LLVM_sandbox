@@ -18,7 +18,7 @@
       }
     },
     {
-      "name": "x64-linux-base",
+      "name": "x64-windows-base",
       "inherits": "x64-base",
       "hidden": true,
       "cacheVariables": {
@@ -33,9 +33,9 @@
     },
     {
       "name": "x64-debug",
-      "displayName": "x64 Debug",
+      "displayName": "x64 Debug Windows",
       "hidden": false,
-      "inherits": "x64-linux-base",
+      "inherits": "x64-windows-base",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "LLVM_ROOT": ""
@@ -43,8 +43,8 @@
     },
     {
       "name": "x64-release",
-      "displayName": "x64 Release",
-      "inherits": "x64-linux-base",
+      "displayName": "x64 Release Windows",
+      "inherits": "x64-windows-base",
       "hidden": false,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
@@ -67,7 +67,7 @@
     },
     {
       "name": "x64-linux-debug",
-      "displayName": "x64 Debug",
+      "displayName": "x64 Debug Linux",
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
@@ -77,7 +77,7 @@
     },
     {
       "name": "x64-linux-debug",
-      "displayName": "x64 Debug",
+      "displayName": "x64 Debug Linux",
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
