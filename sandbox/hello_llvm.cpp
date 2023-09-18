@@ -2,9 +2,6 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/raw_ostream.h>
-#include <lexer/Reader.h>
-#include <lexer/Lexer.h>
-#include <lexer/Token.h>
 
 int main() {
   llvm::outs() << "Hello LLVM!!!\n\n";
