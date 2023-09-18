@@ -1,13 +1,23 @@
-#include <string>
+#include <memory>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
+#include <llvm/Support/raw_ostream.h>
+#include "lexer/Reader.hpp"
+#include "lexer/Lexer.hpp"
+#include "lexer/Token.hpp"
 
-#include "Lexer.hpp"
+int main()
+{
+    llvm::outs() << "Hello LLVM!!!\n\n";
 
-int main(int argc, char **argv) {
-  std::string test{"1.3231"};
+    Lexer lexer(std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
 
-  Lexer lexer {
-    []() {}
-  }
+    Token tok({ TokenType::TOK_INIT, "" });
+    while (tok.type != TokenType::TOK_EOF) {
+        tok = lexer.getToken();
+        std::cout << "got " << tok.value << " as token" << std::endl;
+    }
 
-  return 0;
+    return 0;
 }
