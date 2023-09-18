@@ -6,20 +6,25 @@
 #include "lexer/Token.hpp"
 #include "lexer/Reader.hpp"
 
-Lexer::Lexer(Reader &r) : reader(r) {}
+Lexer::Lexer(std::unique_ptr<Reader> r) : reader(std::move(r)) {}
+// en lugar de copiar el apuntador, se mueve
+// "r" ya no tiene propiedad sobre el objeto Reader y se mueve a "reader"
+// "r" queda como nullptr
+// los métodos que se quieran llamar de la clase Reader se tienen que llamar como:
+// reader-><nombre_método>
 
 Token Lexer::getToken() {
   int lastCharacter = ' ';
 
   while (isspace(lastCharacter)) { // ignora espacios
-    lastCharacter = reader.readChar();
+    lastCharacter = reader->readChar();
   }
 
   // reconocer identificadores -> [aA-zZ][aA-zZ0-9]*
   if (isalpha(lastCharacter)) { // isalpha() revisa si el primer carácter es letra (min o may)
     identifierStr = lastCharacter;
-    while (isalnum(reader.peekNextChar())) { // isalnum() revisa que luego haya letras o números
-      lastCharacter = reader.readChar();
+    while (isalnum(reader->peekNextChar())) { // isalnum() revisa que luego haya letras o números
+      lastCharacter = reader->readChar();
       identifierStr += lastCharacter;
     }
 
@@ -46,8 +51,8 @@ Token Lexer::getToken() {
   if (isdigit(lastCharacter) || lastCharacter == '.') {
     std::string numStr;
     numStr += lastCharacter;
-    while (isdigit(reader.peekNextChar()) || reader.peekNextChar() == '.') {
-      lastCharacter = reader.readChar();
+    while (isdigit(reader->peekNextChar()) || reader->peekNextChar() == '.') {
+      lastCharacter = reader->readChar();
       numStr += lastCharacter;
     }
 
@@ -92,6 +97,6 @@ Token Lexer::getToken() {
   // caso para símbolos extraños... realmente, esto no debería existir...
   // en todo caso, retorna su código ASCII
   //int thisCharacter = lastCharacter;
-  lastCharacter = reader.readChar();
+  lastCharacter = reader->readChar();
   return { TokenType::TOK_UNKNOWN, std::string(1, lastCharacter) };
 }

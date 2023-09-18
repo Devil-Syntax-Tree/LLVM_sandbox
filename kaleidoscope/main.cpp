@@ -1,3 +1,4 @@
+#include <memory>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
@@ -10,10 +11,7 @@ int main()
 {
     llvm::outs() << "Hello LLVM!!!\n\n";
 
-    Reader reader("kaleidoscope/kaleidoscope_example.txt");
-
-    //Lexer lexer([&reader]() { return reader.readChar(); });
-    Lexer lexer(reader);
+    Lexer lexer(std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
 
     Token tok({ TokenType::TOK_INIT, "" });
     while (tok.type != TokenType::TOK_EOF) {
