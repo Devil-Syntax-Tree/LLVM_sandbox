@@ -1,1 +1,1 @@
-﻿target_sources (sandbox_executable PRIVATE hello_llvm.cpp)
+﻿target_sources (sandbox_executable PRIVATE main.cpp)
