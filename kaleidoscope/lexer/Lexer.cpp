@@ -13,6 +13,14 @@ Lexer::Lexer(std::unique_ptr<Reader> r) : reader(std::move(r)) {}
 // los métodos que se quieran llamar de la clase Reader se tienen que llamar como:
 // reader-><nombre_método>
 
+std::string Lexer::getIdentifierStr() {
+  return identifierStr;
+}
+
+double Lexer::getValNum() {
+  return valNum;
+}
+
 Token Lexer::getToken() {
   int lastCharacter = ' ';
 

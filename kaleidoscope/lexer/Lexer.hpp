@@ -11,6 +11,8 @@ public:
     Lexer(std::unique_ptr<Reader> reader);
     ~Lexer() = default;
     Token getToken();
+    std::string getIdentifierStr();
+    double getValNum();
 
 private:
     std::unique_ptr<Reader> reader;
