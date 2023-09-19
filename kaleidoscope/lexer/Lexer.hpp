@@ -13,12 +13,10 @@ public:
     std::string getIdentifierStr();
     double getValNum();
     Token getToken();
-    Token peekNextToken();
-    Token tokenize(char c);
 
 private:
     std::unique_ptr<Reader> reader;
-    int lastCharacter;
+    //int lastCharacter;
     std::string identifierStr;
     double valNum;
 };

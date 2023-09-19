@@ -15,14 +15,8 @@ Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p)
 // Ver un token más adelante del actual.
 Token Parser::getNextToken() {
   curTok = lexer->getToken();
-  std::cout << "valor: " << curTok.value << std::endl;
+  std::cout << "valor token: " << curTok.value << std::endl;
   return curTok;
-}
-
-Token Parser::peekNextToken() {
-  nextTok = lexer->peekNextToken();
-  std::cout << "next: " << nextTok.value << std::endl;
-  return nextTok;
 }
 
 // manejo de errores (¡toca mejorar más adelante!)
@@ -214,29 +208,26 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype() {
     return logErrorP("expected '(' in prototype");
   }
 
-  if (lexer->peekNextToken().type == TokenType::TOK_COMMA) {
-    return logErrorP("expected argument");
-  }
-
   // leer lista de argumentos
   std::vector<std::string> argNames;
   getNextToken();
+  Token entryTok = curTok;
   while (true) {
     if (curTok.type == TokenType::TOK_ID) { // revisar cuando se pone como fib(x, y z) -> sin coma -> me imagino que lo acepta...
       argNames.push_back(lexer->getIdentifierStr());
+      getNextToken(); // saltar posible coma
     }
-
-    getNextToken();
 
     if (curTok.value == ")") {
       break;
     }
 
-    if (curTok.value != ",") { // si parsea una expresión y no le sigue una coma
-      return logErrorP("expected ')' or ',' in argument list");
+    if (curTok.value == ",") {
+      getNextToken();
+      if (curTok.type != TokenType::TOK_ID || entryTok.type != TokenType::TOK_ID) {
+        return logErrorP("expected argument, maybe you forgot...");
+      }
     }
-
-    getNextToken();
   }
 
   if (curTok.value != ")") {
@@ -255,6 +246,11 @@ std::unique_ptr<FunctionAST> Parser::parseDefinition() {
   auto proto = parsePrototype();
   if (!proto) {
     return nullptr;
+  }
+
+  if (curTok.type == TokenType::TOK_EOF) {
+    std::cout << "Success!" << std::endl;
+    exit(EXIT_SUCCESS);
   }
 
   if (auto e = parseExpression()) {
@@ -286,6 +282,7 @@ std::unique_ptr<FunctionAST> Parser::parseTopLevelExpr() {
 void Parser::parse() {
   switch (curTok.type) {
     case TokenType::TOK_EOF:
+      std::cout << "Success!" << std::endl;
       exit(EXIT_SUCCESS);
       return;
     case TokenType::TOK_DEF:

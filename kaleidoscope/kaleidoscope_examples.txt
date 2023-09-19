@@ -1,0 +1,40 @@
+# good examples
+def foo(x)
+    4
+
+def foo(x, y)
+    x + y
+
+def lapoo()
+    1
+
+foo + lapoo
+
+foo(40)
+
+foo(foo(20))
+
+lapoo()
+
+lapoo(foo)
+
+lapoo + foo(10)
+
+3 + 4
+
+3 + lapoo
+
+# examples with errors
+def lapoo(a, )
+    a + b
+
+def foo(, b)
+    a * b
+
+def (x, y)
+    x * y
+
+a +
+
+foo(x
+

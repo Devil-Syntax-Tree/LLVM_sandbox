@@ -11,22 +11,24 @@
 
 int main() {
   llvm::outs() << "Hello LLVM!!!\n\n";
-
+  
+  // ¿¡alguien sabe mejorar el manejo de memoria acá?!
   Lexer lexer(
-      std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
+      std::make_unique<Reader>("kaleidoscope/kaleidoscope.txt"));
 
   Precedence precedence(0);
   Parser parser(std::make_unique<Lexer>(std::make_unique<Reader>(
-                    "kaleidoscope/kaleidoscope_example.txt")),
+                    "kaleidoscope/kaleidoscope.txt")),
                 std::make_unique<Precedence>(precedence));
 
   Token tok({TokenType::TOK_INIT, ""});
   parser.getNextToken();
   while (tok.type != TokenType::TOK_EOF) {
     tok = lexer.getToken();
-    // std::cout << "got " << tok.value << " as token" << std::endl;
     parser.parse();
   }
+
+  std::cout << "Success!" << std::endl;
 
   return 0;
 }
