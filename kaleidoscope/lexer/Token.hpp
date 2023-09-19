@@ -23,6 +23,8 @@ enum class TokenType {
     TOK_DIV,
     TOK_LESS,
     TOK_GREATER,
+    TOK_COMMA,
+    TOK_DOT,
     TOK_UNKNOWN
 };
 

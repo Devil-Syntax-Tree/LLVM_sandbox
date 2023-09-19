@@ -1,23 +1,32 @@
-#include <memory>
+#include "lexer/Lexer.hpp"
+#include "lexer/Reader.hpp"
+#include "lexer/Token.hpp"
+#include "parser/Parser.hpp"
+#include "parser/Precedence.hpp"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/raw_ostream.h>
-#include "lexer/Reader.hpp"
-#include "lexer/Lexer.hpp"
-#include "lexer/Token.hpp"
+#include <memory>
 
-int main()
-{
-    llvm::outs() << "Hello LLVM!!!\n\n";
+int main() {
+  llvm::outs() << "Hello LLVM!!!\n\n";
 
-    Lexer lexer(std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
+  Lexer lexer(
+      std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
 
-    Token tok({ TokenType::TOK_INIT, "" });
-    while (tok.type != TokenType::TOK_EOF) {
-        tok = lexer.getToken();
-        std::cout << "got " << tok.value << " as token" << std::endl;
-    }
+  Precedence precedence(0);
+  Parser parser(std::make_unique<Lexer>(std::make_unique<Reader>(
+                    "kaleidoscope/kaleidoscope_example.txt")),
+                std::make_unique<Precedence>(precedence));
 
-    return 0;
+  Token tok({TokenType::TOK_INIT, ""});
+  parser.getNextToken();
+  while (tok.type != TokenType::TOK_EOF) {
+    tok = lexer.getToken();
+    // std::cout << "got " << tok.value << " as token" << std::endl;
+    parser.parse();
+  }
+
+  return 0;
 }

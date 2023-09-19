@@ -10,9 +10,11 @@ public:
     //Lexer(Reader &r);
     Lexer(std::unique_ptr<Reader> reader);
     ~Lexer() = default;
-    Token getToken();
     std::string getIdentifierStr();
     double getValNum();
+    Token getToken();
+    Token peekNextToken();
+    Token tokenize(char c);
 
 private:
     std::unique_ptr<Reader> reader;
