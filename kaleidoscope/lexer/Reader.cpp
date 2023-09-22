@@ -54,7 +54,6 @@ char Reader::peekNextChar() {
     std::streampos currentPos = file_.tellg();  // Guarda la posición actual
     char nextChar;
     file_.seekg(0, std::ios::cur);  // Mueve el puntero una posición hacia adelante
-
     if (file_.get(nextChar)) {
         file_.seekg(currentPos);  // Regresa el puntero a su posición original
         return nextChar;
