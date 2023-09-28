@@ -11,7 +11,7 @@ class Codegen {
 public:
     Codegen() = default;
     ~Codegen() = default;
-    Value* LogErrorV(const char *str);
+    Value* logErrorV(const char *str);
     static std::unique_ptr<LLVMContext> TheContext; // estructuras de datos como "tipos" y "constantes"
     static std::unique_ptr<IRBuilder<>> Builder; // ayuda a generar instrucciones LLVM
     static std::unique_ptr<Module> TheModule; // construct de LLVM que contiene funciones y variables globales -> LA estructura top-level que usa LLVm IR

@@ -39,36 +39,89 @@ Value *NumberExprAST::codegen() {
 }
 
 Value *VariableExprAST::codegen() {
-    // buscar esta variable en la tabla de símbolos
-    Value *v = Codegen::namedValues[name];
-    if (!v) {
-        cn->LogErrorV("Unknown variable name");
-    }
+  // buscar esta variable en la tabla de símbolos global
+  Value *v = Codegen::namedValues[name];
+  if (!v) {
+    cn->logErrorV("Unknown variable name");
+  }
 
-    return v;
+  return v;
 }
 
 Value *BinaryExprAST::codegen() {
-    Value *l = LHS->codegen();
-    Value *r = RHS->codegen();
-    if (!l || !r) {
-        return nullptr;
+  Value *l = LHS->codegen();
+  Value *r = RHS->codegen();
+  if (!l || !r) {
+    return nullptr;
+  }
+
+  switch (op) {
+  case '+':
+    return Codegen::Builder->CreateFAdd(l, r, "addtmp");
+  case '-':
+    return Codegen::Builder->CreateFSub(l, r, "subtmp");
+  case '*':
+    return Codegen::Builder->CreateFMul(l, r, "multmp");
+  case '/':
+    return Codegen::Builder->CreateFDiv(l, r, "divtmp");
+  case '<':
+    l = Codegen::Builder->CreateFCmpULT(l, r, "cmptmp");
+    return Codegen::Builder->CreateUIToFP(
+        l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
+  case '>':
+    l = Codegen::Builder->CreateFCmpUGT(l, r, "cmptmp");
+    return Codegen::Builder->CreateUIToFP(
+        l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
+  default:
+    return cn->logErrorV("invalid binary operator");
+  }
+}
+
+Value *CallExprAST::codegen() {
+  // busca el nombre de la función en la tabla de símbolos global
+  Function *calleeF = Codegen::TheModule->getFunction(callee);
+  if (!calleeF) {
+    return cn->logErrorV("unknwown function referenced");
+  }
+
+  // compara tamaño de lista de argumentos
+  if (calleeF->arg_size() != args.size()) {
+    return cn->logErrorV("incorrect number of arguments in function call");
+  }
+
+  // toca tener, además, una secicón de comparación de tipo de dato de cada
+  // parámetro
+
+  std::vector<Value *> argsV;
+  for (unsigned i = 0, e = args.size(); i != e; ++i) {
+    argsV.push_back(args[i]->codegen());
+    if (!argsV.back()) {
+      return nullptr;
+    }
+  }
+
+  return Codegen::Builder->CreateCall(calleeF, argsV, "calltmp");
+}
+
+Function *PrototypeAST::codegen() {
+  // hace el tipo de la función -> crea un vector de "N" tipos double LLVM
+  std::vector<Type *> doubles(args.size(),
+                              Type::getDoubleTy(*Codegen::TheContext));
+
+// crea una función que tiene como parámetro "N" doubles y retorna uno
+  FunctionType *ft = FunctionType::get(Type::getDoubleTy(*Codegen::TheContext),
+                                       doubles, false);
+
+// se genera la función LLVM correspondiente
+  Function *f = Function::Create(ft, Function::ExternalLinkage, // se refiere a que la función puede o no ser definida en el módulo actual
+                                 name,
+                                 Codegen::TheModule.get()); // registra el nombre nuevo
+
+    // nombres para los parámetros
+    unsigned idx = 0;
+    for (auto &arg : f->args()) {
+        arg.setName(args[idx++]);
     }
 
-    switch (op) {
-        case '+':
-            return Codegen::Builder->CreateFAdd(l, r, "addtmp");
-        case '-':
-            return Codegen::Builder->CreateFSub(l, r, "subtmp");
-        case '*':
-            return Codegen::Builder->CreateFMul(l, r, "multmp");
-        case '/':
-            return Codegen::Builder->CreateFDiv(l, r, "divtmp");
-        case '<':
-            l = Codegen::Builder->CreateFCmpULT(l, r, "cmptmp");
-            return Codegen::Builder->CreateUIToFP(l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
-        case '>':
-            l = Codegen::Builder->CreateFCmpUGT(l, r, "cmptmp");
-            return Codegen::Builder->CreateUIToFP(l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
-    }
+    return f;
 }

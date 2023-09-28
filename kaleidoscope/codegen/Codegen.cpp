@@ -14,7 +14,7 @@ std::unique_ptr<Module> Codegen::TheModule =
     std::make_unique<Module>("root", *TheContext);
 std::map<std::string, Value *> Codegen::namedValues;
 
-Value* Codegen::LogErrorV(const char *str) {
+Value* Codegen::logErrorV(const char *str) {
   fprintf(stderr, "Error: %s\n", str);
   exit(EXIT_FAILURE);
   return nullptr;
