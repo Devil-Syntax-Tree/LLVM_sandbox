@@ -15,6 +15,7 @@ public:
   Parser(std::unique_ptr<Lexer> lexer, std::unique_ptr<Precedence> precedence);
   ~Parser() = default;
   Token getNextToken();
+  Token getCurTok();
   std::unique_ptr<ExprAST> logError(const char *str);
   std::unique_ptr<PrototypeAST> logErrorP(const char *str);
   std::unique_ptr<ExprAST> parseNumberExpr();

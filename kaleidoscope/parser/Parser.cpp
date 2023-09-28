@@ -12,10 +12,14 @@
 Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p)
     : lexer(std::move(l)), precedence(std::move(p)) {}
 
-// Ver un token más adelante del actual.
+// adelantar al siguiente token
 Token Parser::getNextToken() {
   curTok = lexer->getToken();
-  std::cout << "valor token: " << curTok.value << std::endl;
+  //std::cout << "valor token: " << curTok.value << std::endl;
+  return curTok;
+}
+
+Token Parser::getCurTok() {
   return curTok;
 }
 

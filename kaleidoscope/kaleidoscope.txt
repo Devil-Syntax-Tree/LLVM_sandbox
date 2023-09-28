@@ -1,2 +1,8 @@
-def foo(x, y)
-    x + y
+def foo(a, b)
+    a + a
+
+3 + 5
+
+foo(3, 4) + foo(1, 2)
+
+3 + foo(3, 4)

@@ -1,6 +1,8 @@
 #include "parser/AST.hpp"
 #include "codegen/Codegen.hpp"
 #include "llvm/ADT/APFloat.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Verifier.h"
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -22,6 +24,8 @@ CallExprAST::CallExprAST(const std::string &callee,
 PrototypeAST::PrototypeAST(const std::string &name,
                            std::vector<std::string> args)
     : name(name), args(std::move(args)) {}
+
+std::string PrototypeAST::getName() { return name; }
 
 FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
                          std::unique_ptr<ExprAST> body)
@@ -108,20 +112,69 @@ Function *PrototypeAST::codegen() {
   std::vector<Type *> doubles(args.size(),
                               Type::getDoubleTy(*Codegen::TheContext));
 
-// crea una función que tiene como parámetro "N" doubles y retorna uno
+  // crea una función que tiene como parámetro "N" doubles y retorna uno
   FunctionType *ft = FunctionType::get(Type::getDoubleTy(*Codegen::TheContext),
                                        doubles, false);
 
-// se genera la función LLVM correspondiente
-  Function *f = Function::Create(ft, Function::ExternalLinkage, // se refiere a que la función puede o no ser definida en el módulo actual
-                                 name,
-                                 Codegen::TheModule.get()); // registra el nombre nuevo
+  // se genera la función LLVM correspondiente
+  Function *f = Function::Create(
+      ft, Function::ExternalLinkage, // se refiere a que la función puede o no
+                                     // ser definida en el módulo actual
+      name,
+      Codegen::TheModule.get()); // registra el nombre nuevo
 
-    // nombres para los parámetros
-    unsigned idx = 0;
-    for (auto &arg : f->args()) {
-        arg.setName(args[idx++]);
+  // nombres para los parámetros
+  unsigned idx = 0;
+  for (auto &arg : f->args()) {
+    arg.setName(args[idx++]);
+  }
+
+  return f;
+}
+
+Function *FunctionAST::codegen() {
+  // revisa si hay una función existente de alguna otra declaración
+  Function *TheFunction = Codegen::TheModule->getFunction(proto->getName());
+
+  // asegurarse que no tenga cuerpo aún
+  if (!TheFunction) {
+    TheFunction = proto->codegen();
+  }
+
+  if (!TheFunction) {
+    return nullptr;
+  }
+
+  if (!TheFunction->empty()) {
+    return (Function *)cn->logErrorV("function cannot be redefined.");
+  }
+
+  // crear un nuevo bloque básico para empezar la inserción
+  //  -> la idea es ir "insertando" instrucciones a la función
+  BasicBlock *BB =
+      BasicBlock::Create(*Codegen::TheContext, "entry", TheFunction);
+  Codegen::Builder->SetInsertPoint(BB);
+
+  // guardar los parámetros de la función en el mapa namedValues
+  Codegen::namedValues.clear();
+  for (auto &arg : TheFunction->args()) {
+    Codegen::namedValues[std::string(arg.getName())] = &arg;
+  }
+
+  if (Value *retVal = body->codegen()) {
+    // crea retorno de función (fin de función)
+    Codegen::Builder->CreateRet(retVal);
+
+    // validar el código generado, revisar consistencia
+    if (verifyFunction(*TheFunction, &errs())) {
+      TheFunction->eraseFromParent();
+      return nullptr;
     }
 
-    return f;
+    return TheFunction;
+  }
+
+  // error en el cuerpo, elimina la función
+  TheFunction->eraseFromParent();
+  return nullptr;
 }

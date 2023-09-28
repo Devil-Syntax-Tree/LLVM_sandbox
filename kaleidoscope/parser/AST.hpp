@@ -5,6 +5,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "llvm/IR/Value.h"
+#include "llvm/IR/Function.h"
+
+using namespace llvm;
 
 // clase base para todo nodo de expresión
 class ExprAST {
@@ -67,6 +71,7 @@ class PrototypeAST {
 
 public:
   PrototypeAST(const std::string &name, std::vector<std::string> args);
+  std::string getName();
   Function *codegen();
 };
 
