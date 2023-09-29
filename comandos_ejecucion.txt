@@ -1,3 +1,6 @@
+instalar ninja:
+    sudo apt update
+    sudo apt install ninja-build
 configuración cmake:
     (ejemplo con preset x64-linux-release)
     cmake --preset=x64-linux-release
