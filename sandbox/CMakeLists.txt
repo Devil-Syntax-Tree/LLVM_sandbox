@@ -7,6 +7,12 @@ set_target_properties (sandbox_executable PROPERTIES
     OUTPUT_NAME sandbox
 )
 
+if (ipo_lto_supported)
+    set_target_properties (sandbox_executable PROPERTIES
+        INTERPROCEDURAL_OPTIMIZATION TRUE
+    )
+endif ()
+
 llvm_map_components_to_libnames (llvm_sandbox_required_libs core)
 
 target_link_libraries (sandbox_executable PRIVATE ${llvm_sandbox_required_libs})

@@ -6,6 +6,15 @@ project (
     LLVM_sandbox
     LANGUAGES C CXX)
 
+include(CheckIPOSupported)
+
+check_ipo_supported (RESULT ipo_lto_supported OUTPUT ipo_output LANGUAGES CXX)
+if (NOT ipo_lto_supported)
+    message("Interprocedural optimization is not suported...")
+    message(ipo_output)
+endif ()
+
+
 find_package (LLVM 17 CONFIG REQUIRED)
 
 add_subdirectory (sandbox)
