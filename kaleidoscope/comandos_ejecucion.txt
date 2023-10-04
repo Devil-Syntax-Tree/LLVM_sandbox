@@ -1,8 +1,0 @@
-configuración cmake:
-    (ejemplo con preset x64-linux-release)
-    cmake --preset=x64-linux-release
-build:
-    cmake --build out/build/x64-linux-release/
-ejecución ejecutable:
-    (ejemplo con preset x64-linux-release)
-    out/build/x64-linux-release/sandbox_executable

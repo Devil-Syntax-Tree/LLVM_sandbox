@@ -1,23 +1,17 @@
+#include <iostream>
 #include <memory>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/Support/raw_ostream.h>
-#include "lexer/Reader.hpp"
+
 #include "lexer/Lexer.hpp"
-#include "lexer/Token.hpp"
+#include "reader/ConsoleReader.hpp"
 
-int main()
-{
-    llvm::outs() << "Hello LLVM!!!\n\n";
+int main() {
+  kaleidoscope::Lexer lexer{std::make_unique<kaleidoscope::ConsoleReader>()};
 
-    Lexer lexer(std::make_unique<Reader>("kaleidoscope/kaleidoscope_example.txt"));
+  while (true) {
+    auto token{lexer.nextToken()};
+    std::cout << "Token {TYPE: " << kaleidoscope::to_string(token.type)
+              << ", VALUE: \"" << token.value << "\"}\n";
+  }
 
-    Token tok({ TokenType::TOK_INIT, "" });
-    while (tok.type != TokenType::TOK_EOF) {
-        tok = lexer.getToken();
-        std::cout << "got " << tok.value << " as token" << std::endl;
-    }
-
-    return 0;
+  return 0;
 }

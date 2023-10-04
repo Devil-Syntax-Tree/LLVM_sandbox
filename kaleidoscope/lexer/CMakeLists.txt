@@ -1,7 +1,6 @@
-target_sources (sandbox_executable PRIVATE
-                Reader.cpp
-                Reader.hpp
-                Lexer.cpp
-                Lexer.hpp
-                Token.hpp
+target_sources (kaleidoscope_executable PRIVATE
+    Lexer.hpp
+    Lexer.cpp
+    Token.hpp
+    Token.cpp
 )

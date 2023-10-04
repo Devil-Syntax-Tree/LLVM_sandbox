@@ -18,4 +18,4 @@ endif ()
 find_package (LLVM 17 CONFIG REQUIRED)
 
 add_subdirectory (sandbox)
-# add_subdirectory (kaleidoscope)
+add_subdirectory (kaleidoscope)
