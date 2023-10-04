@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 
 namespace kaleidoscope {
 struct Token {
@@ -28,6 +29,7 @@ struct Token {
 
   TokenType type;
   std::string value;
+  std::optional<double> literalValue;
 };
 
 std::string to_string(Token::TokenType value);

@@ -10,7 +10,11 @@ int main() {
   while (true) {
     auto token{lexer.nextToken()};
     std::cout << "Token {TYPE: " << kaleidoscope::to_string(token.type)
-              << ", VALUE: \"" << token.value << "\"}\n";
+              << ", VALUE: \"" << token.value << "\", LITERAL_VALUE: "
+              << (token.literalValue.has_value()
+                      ? std::to_string(token.literalValue.value())
+                      : "NONE")
+              << "}\n";
   }
 
   return 0;

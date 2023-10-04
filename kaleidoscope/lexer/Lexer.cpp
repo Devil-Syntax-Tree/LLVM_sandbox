@@ -51,7 +51,7 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     } while (isdigit(lastCharacter) || lastCharacter == '.');
 
     auto literalValue = std::stod(doubleRepresentation);
-    return {TokenType::NUMBER, doubleRepresentation};
+    return {TokenType::NUMBER, "DOUBLE_NUMBER", literalValue};
   }
 
   if (lastCharacter == '=') {
