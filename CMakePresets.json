@@ -2,8 +2,7 @@
   "version": 3,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 22,
-    "patch": 0
+    "minor": 22
   },
   "configurePresets": [
     {
@@ -18,46 +17,13 @@
       }
     },
     {
-      "name": "x64-windows-base",
-      "inherits": "x64-base",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "cl.exe",
-        "CMAKE_CXX_COMPILER": "cl.exe"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "x64-debug",
-      "displayName": "x64 Debug Windows",
-      "hidden": false,
-      "inherits": "x64-windows-base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "LLVM_ROOT": ""
-      }
-    },
-    {
-      "name": "x64-release",
-      "displayName": "x64 Release Windows",
-      "inherits": "x64-windows-base",
-      "hidden": false,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "LLVM_ROOT": ""
-      }
-    },
-    {
       "name": "x64-linux-base",
       "inherits": "x64-base",
       "hidden": true,
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_CXX_COMPILER": "g++"
+        "CMAKE_C_COMPILER": "clang-17",
+        "CMAKE_CXX_COMPILER": "clang++-17",
+        "CMAKE_LINKER": "mold"
       },
       "condition": {
         "type": "equals",
@@ -71,8 +37,7 @@
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
-        "LLVM_ROOT": ""
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
@@ -81,9 +46,35 @@
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "LLVM_ROOT": ""
+        "CMAKE_BUILD_TYPE": "Release"
       }
+    }
+  ],
+  "buildPresets": [
+    { "name": "x64-base", "hidden": true, "jobs": 4, "verbose": true },
+    {
+      "name": "x64-base-linux",
+      "hidden": true,
+      "inherits": "x64-base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "x64-linux-debug",
+      "displayName": "x64 Debug Linux Build",
+      "hidden": false,
+      "inherits": "x64-base-linux",
+      "configurePreset": "x64-linux-debug"
+    },
+    {
+      "name": "x64-linux-release",
+      "displayName": "x64 Release Linux Build",
+      "hidden": false,
+      "inherits": "x64-base-linux",
+      "configurePreset": "x64-linux-release"
     }
   ]
 }

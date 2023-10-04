@@ -1,0 +1,25 @@
+{
+  "name": "LLVM sandbox official dev environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "GitHub.vscode-github-actions",
+        "eamodio.gitlens",
+        "github.vscode-pull-request-github",
+        "davidanson.vscode-markdownlint",
+        "EditorConfig.EditorConfig",
+        "esbenp.prettier-vscode",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

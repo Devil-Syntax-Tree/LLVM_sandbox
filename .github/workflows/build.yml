@@ -1,0 +1,19 @@
+---
+name: LLVM_sandbox Build
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+      - name: Build sandbox
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            cmake --preset x64-linux-debug
+            cmake --build --preset x64-linux-debug
+            cmake --preset x64-linux-release
+            cmake --build --preset x64-linux-release
