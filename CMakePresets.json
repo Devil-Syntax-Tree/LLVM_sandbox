@@ -22,8 +22,7 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang-17",
-        "CMAKE_CXX_COMPILER": "clang++-17",
-        "CMAKE_LINKER": "mold"
+        "CMAKE_CXX_COMPILER": "clang++-17"
       },
       "condition": {
         "type": "equals",
@@ -33,7 +32,7 @@
     },
     {
       "name": "x64-linux-debug",
-      "displayName": "x64 Debug Linux",
+      "displayName": "x64 Linux Debug",
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
@@ -42,7 +41,7 @@
     },
     {
       "name": "x64-linux-release",
-      "displayName": "x64 Release Linux",
+      "displayName": "x64 Linux Release",
       "hidden": false,
       "inherits": "x64-linux-base",
       "cacheVariables": {
@@ -64,14 +63,14 @@
     },
     {
       "name": "x64-linux-debug",
-      "displayName": "x64 Debug Linux Build",
+      "displayName": "x64 Linux Debug Build",
       "hidden": false,
       "inherits": "x64-base-linux",
       "configurePreset": "x64-linux-debug"
     },
     {
       "name": "x64-linux-release",
-      "displayName": "x64 Release Linux Build",
+      "displayName": "x64 Linux Release Build",
       "hidden": false,
       "inherits": "x64-base-linux",
       "configurePreset": "x64-linux-release"
