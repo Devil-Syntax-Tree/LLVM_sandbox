@@ -7,6 +7,10 @@
   "workspaceFolder": "/workspace",
   "customizations": {
     "vscode": {
+      "settings": {
+        "editor.renderWhitespace": "boundary",
+        "editor.wordWrap": "off"
+      },
       "extensions": [
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools",
