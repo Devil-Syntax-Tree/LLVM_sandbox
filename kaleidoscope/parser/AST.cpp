@@ -1,5 +1,5 @@
-#include "parser/AST.hpp"
-#include "codegen/Codegen.hpp"
+#include "AST.hpp"
+#include "../codegen/Codegen.hpp"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Verifier.h"
@@ -9,25 +9,25 @@
 #include <string>
 #include <vector>
 
-NumberExprAST::NumberExprAST(double val) : val(val) {}
+kaleidoscope::NumberExprAST::NumberExprAST(double val) : val(val) {}
 
-VariableExprAST::VariableExprAST(const std::string &name) : name(name) {}
+kaleidoscope::VariableExprAST::VariableExprAST(const std::string &name) : name(name) {}
 
-BinaryExprAST::BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
+kaleidoscope::BinaryExprAST::BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
                              std::unique_ptr<ExprAST> RHS)
     : op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 
-CallExprAST::CallExprAST(const std::string &callee,
+kaleidoscope::CallExprAST::CallExprAST(const std::string &callee,
                          std::vector<std::unique_ptr<ExprAST>> args)
     : callee(callee), args(std::move(args)) {}
 
-PrototypeAST::PrototypeAST(const std::string &name,
+kaleidoscope::PrototypeAST::PrototypeAST(const std::string &name,
                            std::vector<std::string> args)
     : name(name), args(std::move(args)) {}
 
-std::string PrototypeAST::getName() { return name; }
+std::string kaleidoscope::PrototypeAST::getName() { return name; }
 
-FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
+kaleidoscope::FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
                          std::unique_ptr<ExprAST> body)
     : proto(std::move(proto)), body(std::move(body)) {}
 
@@ -35,14 +35,14 @@ FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
 // Code Generation //
 // =============== //
 
-static std::unique_ptr<Codegen> cn;
+static std::unique_ptr<kaleidoscope::Codegen> cn;
 
-Value *NumberExprAST::codegen() {
+llvm::Value *kaleidoscope::NumberExprAST::codegen() {
   // en LLVM IR, constantes numéricas se representan con ConstantFP
   return ConstantFP::get(*Codegen::TheContext, llvm::APFloat(val));
 }
 
-Value *VariableExprAST::codegen() {
+llvm::Value *kaleidoscope::VariableExprAST::codegen() {
   // buscar esta variable en la tabla de símbolos global
   Value *v = Codegen::namedValues[name];
   if (!v) {
@@ -52,7 +52,7 @@ Value *VariableExprAST::codegen() {
   return v;
 }
 
-Value *BinaryExprAST::codegen() {
+llvm::Value *kaleidoscope::BinaryExprAST::codegen() {
   Value *l = LHS->codegen();
   Value *r = RHS->codegen();
   if (!l || !r) {
@@ -81,7 +81,7 @@ Value *BinaryExprAST::codegen() {
   }
 }
 
-Value *CallExprAST::codegen() {
+llvm::Value *kaleidoscope::CallExprAST::codegen() {
   // busca el nombre de la función en la tabla de símbolos global
   Function *calleeF = Codegen::TheModule->getFunction(callee);
   if (!calleeF) {
@@ -107,7 +107,7 @@ Value *CallExprAST::codegen() {
   return Codegen::Builder->CreateCall(calleeF, argsV, "calltmp");
 }
 
-Function *PrototypeAST::codegen() {
+llvm::Function *kaleidoscope::PrototypeAST::codegen() {
   // hace el tipo de la función -> crea un vector de "N" tipos double LLVM
   std::vector<Type *> doubles(args.size(),
                               Type::getDoubleTy(*Codegen::TheContext));
@@ -132,7 +132,7 @@ Function *PrototypeAST::codegen() {
   return f;
 }
 
-Function *FunctionAST::codegen() {
+llvm::Function *kaleidoscope::FunctionAST::codegen() {
   // revisa si hay una función existente de alguna otra declaración
   Function *TheFunction = Codegen::TheModule->getFunction(proto->getName());
 

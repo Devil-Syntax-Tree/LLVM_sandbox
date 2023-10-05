@@ -1,4 +1,4 @@
-target_sources (sandbox_executable PRIVATE
+target_sources (kaleidoscope_executable PRIVATE
                 AST.cpp
                 AST.hpp
                 Parser.cpp

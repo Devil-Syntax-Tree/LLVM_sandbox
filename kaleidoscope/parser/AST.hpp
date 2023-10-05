@@ -8,6 +8,8 @@
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Function.h"
 
+namespace kaleidoscope {
+  
 using namespace llvm;
 
 // clase base para todo nodo de expresión
@@ -85,3 +87,5 @@ public:
               std::unique_ptr<ExprAST> body);
   Function *codegen();
 };
+
+} // namespace kaleidoscope

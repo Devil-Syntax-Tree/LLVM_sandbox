@@ -1,37 +1,37 @@
-#include "parser/Parser.hpp"
-#include "lexer/Lexer.hpp"
-#include "lexer/Token.hpp"
-#include "parser/AST.hpp"
-#include "parser/Precedence.hpp"
+#include "../parser/Parser.hpp"
+#include "../lexer/Lexer.hpp"
+#include "../lexer/Token.hpp"
+#include "../parser/AST.hpp"
+#include "../parser/Precedence.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <bits/stdc++.h>
 
-Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p)
-    : lexer(std::move(l)), precedence(std::move(p)) {}
+kaleidoscope::Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p)
+    : lexer{std::move(l)}, precedence{std::move(p)} {}
 
 // adelantar al siguiente token
-Token Parser::getNextToken() {
-  curTok = lexer->getToken();
+kaleidoscope::Token kaleidoscope::Parser::getNextToken() {
+  curTok = lexer->nextToken();
   //std::cout << "valor token: " << curTok.value << std::endl;
   return curTok;
 }
 
-Token Parser::getCurTok() {
+kaleidoscope::Token kaleidoscope::Parser::getCurTok() {
   return curTok;
 }
 
 // manejo de errores (¡toca mejorar más adelante!)
-std::unique_ptr<ExprAST> Parser::logError(const char *str) {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::logError(const char *str) {
   //std::cerr << "Error: " << str << "\n" << std::endl;
   fprintf(stderr, "Error: %s\n", str);
   exit(EXIT_FAILURE);
   return nullptr;
 }
 
-std::unique_ptr<PrototypeAST> Parser::logErrorP(const char *str) {
+std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::logErrorP(const char *str) {
   logError(str);
   return nullptr;
 }
@@ -43,7 +43,7 @@ std::unique_ptr<PrototypeAST> Parser::logErrorP(const char *str) {
 // numberExptr ::= number
 // crea un nodo NumberExprAST, avanza el lexer al siguiente token
 // retorna.
-std::unique_ptr<ExprAST> Parser::parseNumberExpr() {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseNumberExpr() {
   auto result = std::make_unique<NumberExprAST>(
       lexer->getValNum()); // auto es para deducir el tipo de la variable
 
@@ -52,7 +52,7 @@ std::unique_ptr<ExprAST> Parser::parseNumberExpr() {
 }
 
 // parenExpr ::= '(' expression ')'
-std::unique_ptr<ExprAST> Parser::parseParenExpr() {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseParenExpr() {
   getNextToken(); // se come '('
   auto v = parseExpression();
   if (!v) {
@@ -70,7 +70,7 @@ std::unique_ptr<ExprAST> Parser::parseParenExpr() {
 // identifierExpr
 //   ::= identifier
 //   ::= identifier '(' expression* ')'
-std::unique_ptr<ExprAST> Parser::parseIdentifierExpr() {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseIdentifierExpr() {
   std::string idName = lexer->getIdentifierStr();
   
   getNextToken();
@@ -106,7 +106,7 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr() {
   }
 
   getNextToken(); // se come ')'
-  if (curTok.type == TokenType::TOK_ID) {
+  if (curTok.type == kaleidoscope::Token::TokenType::ID) {
     getNextToken();
   }
 
@@ -117,22 +117,22 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr() {
 //   ::= identifierExpr
 //   ::= numberExpr
 //   ::= parenExpr
-std::unique_ptr<ExprAST> Parser::parsePrimary() {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parsePrimary() {
   switch (curTok.type) {
   default:
     return logError("unknown token when expecting an expression");
-  case TokenType::TOK_ID:
+  case kaleidoscope::Token::TokenType::ID:
     return parseIdentifierExpr();
-  case TokenType::TOK_NUMBER:
+  case kaleidoscope::Token::TokenType::NUMBER:
     return parseNumberExpr();
-  case TokenType::TOK_L_PAR:
+  case kaleidoscope::Token::TokenType::LEFT_PARENTHESES:
     return parseParenExpr();
   }
 }
 
 // expression
 //   ::= primary opers
-std::unique_ptr<ExprAST> Parser::parseExpression() {
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseExpression() {
   auto LHS = parsePrimary();
   if (!LHS) {
     return nullptr;
@@ -154,7 +154,7 @@ std::unique_ptr<ExprAST> Parser::parseExpression() {
  * se combina 4 y 5 con operador * en el nodo BinaryExprAST
  * se combina el resultado anterior con 3 con operador + en un nodo BinaryExprAST
 */
-std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int exprPrec,
+std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseBinOpRHS(int exprPrec,
                                                std::unique_ptr<ExprAST> LHS) {
 
   while (true) { // sabemos que va a acabar cuando token inválidos son -1
@@ -198,8 +198,8 @@ std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int exprPrec,
 
 // prototype
 //   ::= id '(' id* ')'
-std::unique_ptr<PrototypeAST> Parser::parsePrototype() {
-  if (curTok.type != TokenType::TOK_ID) {
+std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::parsePrototype() {
+  if (curTok.type != kaleidoscope::Token::TokenType::ID) {
     return logErrorP("expected function name in prototype");
   }
 
@@ -217,7 +217,7 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype() {
   getNextToken();
   Token entryTok = curTok;
   while (true) {
-    if (curTok.type == TokenType::TOK_ID) { // revisar cuando se pone como fib(x, y z) -> sin coma -> me imagino que lo acepta...
+    if (curTok.type == kaleidoscope::Token::TokenType::ID) { // revisar cuando se pone como fib(x, y z) -> sin coma -> me imagino que lo acepta...
       argNames.push_back(lexer->getIdentifierStr());
       getNextToken(); // saltar posible coma
     }
@@ -228,7 +228,7 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype() {
 
     if (curTok.value == ",") {
       getNextToken();
-      if (curTok.type != TokenType::TOK_ID || entryTok.type != TokenType::TOK_ID) {
+      if (curTok.type !=kaleidoscope::Token::TokenType::ID || entryTok.type != kaleidoscope::Token::TokenType::ID) {
         return logErrorP("expected argument, maybe you forgot...");
       }
     }
@@ -245,14 +245,14 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype() {
 
 // definition
 //   ::= 'def' prototype expression
-std::unique_ptr<FunctionAST> Parser::parseDefinition() {
+std::unique_ptr<kaleidoscope::FunctionAST> kaleidoscope::Parser::parseDefinition() {
   getNextToken(); // se come 'def'
   auto proto = parsePrototype();
   if (!proto) {
     return nullptr;
   }
 
-  if (curTok.type == TokenType::TOK_EOF) {
+  if (curTok.type == kaleidoscope::Token::TokenType::END_OF_FILE) {
     std::cout << "Success!" << std::endl;
     exit(EXIT_SUCCESS);
   }
@@ -266,14 +266,14 @@ std::unique_ptr<FunctionAST> Parser::parseDefinition() {
 
 // external
 //    ::= 'extern' prototype
-std::unique_ptr<PrototypeAST> Parser::parseExtern() {
+std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::parseExtern() {
   getNextToken(); // se come 'extern'
   return parsePrototype();
 }
 
 // topLevelExpr
 //    ::= expression
-std::unique_ptr<FunctionAST> Parser::parseTopLevelExpr() {
+std::unique_ptr<kaleidoscope::FunctionAST> kaleidoscope::Parser::parseTopLevelExpr() {
   if (auto e = parseExpression()) {
     // proto anónimo
     auto proto = std::make_unique<PrototypeAST>("", std::vector<std::string>());
@@ -283,13 +283,13 @@ std::unique_ptr<FunctionAST> Parser::parseTopLevelExpr() {
   return nullptr;
 }
 
-void Parser::parse() {
+void kaleidoscope::Parser::parse() {
   switch (curTok.type) {
-    case TokenType::TOK_EOF:
+    case kaleidoscope::Token::TokenType::END_OF_FILE:
       std::cout << "Success!" << std::endl;
       exit(EXIT_SUCCESS);
       return;
-    case TokenType::TOK_DEF:
+    case kaleidoscope::Token::TokenType::DEF:
       parseDefinition();
       break;
     default:

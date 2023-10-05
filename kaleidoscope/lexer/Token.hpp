@@ -24,6 +24,7 @@ struct Token {
     DIV,
     LESS,
     GREATER,
+    COMMA,
     UNKNOWN
   };
 

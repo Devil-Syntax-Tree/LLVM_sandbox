@@ -1,14 +1,16 @@
 #pragma once
 
-#include "lexer/Lexer.hpp"
-#include "lexer/Reader.hpp"
-#include "lexer/Token.hpp"
-#include "parser/Parser.hpp"
-#include "parser/Precedence.hpp"
+#include "../lexer/Lexer.hpp"
+#include "../reader/Reader.hpp"
+#include "../lexer/Token.hpp"
+#include "../parser/Parser.hpp"
+#include "../parser/Precedence.hpp"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/LegacyPassManager.h>
+
+namespace kaleidoscope {
 
 using namespace llvm;
 
@@ -43,3 +45,5 @@ private:
   static std::unique_ptr<Precedence> precedence;
   static std::unique_ptr<Parser> parser;
 };
+
+} // namespace kaleidoscope

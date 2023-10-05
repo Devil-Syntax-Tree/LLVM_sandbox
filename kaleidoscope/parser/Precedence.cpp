@@ -1,12 +1,12 @@
+#include "../lexer/Token.hpp"
+#include "Precedence.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <bits/stdc++.h>
-#include "lexer/Token.hpp"
-#include "parser/Precedence.hpp"
 
-Precedence::Precedence(int n) : num(n) {
+kaleidoscope::Precedence::Precedence(int n) : num(n) {
     precedenceMap['<'] = 1;
     precedenceMap['>'] = 2;
     precedenceMap['+'] = 3;
@@ -15,7 +15,7 @@ Precedence::Precedence(int n) : num(n) {
     precedenceMap['/'] = 6; // más grande
 }
 
-int Precedence::getTokenPrecedence(Token curTok) {
+int kaleidoscope::Precedence::getTokenPrecedence(Token curTok) {
     char arr[curTok.value.length() + 1];
     strcpy(arr, curTok.value.c_str());
     char curTokInt = arr[0];

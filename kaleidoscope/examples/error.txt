@@ -1,0 +1,14 @@
+# examples with errors
+
+def lapoo(a, )
+    a + b
+
+def foo(, b)
+    a * b
+
+def (x, y)
+    x * y
+
+a +
+
+foo(x

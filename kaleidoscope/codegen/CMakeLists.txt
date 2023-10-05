@@ -1,5 +1,4 @@
-target_sources (sandbox_executable PRIVATE
+target_sources (kaleidoscope_executable PRIVATE
                 Codegen.cpp
                 Codegen.hpp
-                KaleidoscopeJIT.hpp
 )

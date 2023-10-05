@@ -5,9 +5,9 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "lexer/Token.hpp"
+#include "../lexer/Token.hpp"
 
-// clase base para todo nodo de expresión
+namespace kaleidoscope {
 class Precedence {
 public:
     Precedence(int n);
@@ -18,3 +18,5 @@ private:
     std::map<char, int> precedenceMap;
     int num;
 };
+
+} // namespace kaleidoscope
