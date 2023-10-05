@@ -12,7 +12,7 @@ int main() {
       std::make_unique<kaleidoscope::FileReader>(kaleidoscopeFile)};
 
   auto run{true};
-  while (true) {
+  while (run) {
     auto token{lexer.nextToken()};
     std::cout << "Token {TYPE: " << kaleidoscope::to_string(token.type)
               << ", VALUE: \"" << token.value << "\", LITERAL_VALUE: "

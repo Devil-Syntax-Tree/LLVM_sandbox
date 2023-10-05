@@ -47,7 +47,7 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     std::string doubleRepresentation;
     do {
       doubleRepresentation += lastCharacter;
-      lastCharacter = getchar();
+      lastCharacter = reader->nextCharacter();
     } while (isdigit(lastCharacter) || lastCharacter == '.');
 
     auto literalValue = std::stod(doubleRepresentation);
