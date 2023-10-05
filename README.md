@@ -28,6 +28,24 @@ or use and configure the CMake presets
 cmake --preset=<preset_name>
 ```
 
+### Example with x64-linux-release
+
+CMake preset
+
+```
+cmake --preset=x64-linux-release
+```
+
+build executable
+
+```
+cmake --build out/build/x64-linux-release/
+```
+
+execute
+
+out/build/x64-linux-release/sandbox/sandbox
+
 go to the build directory and run the executable!
 
 ## Notes
