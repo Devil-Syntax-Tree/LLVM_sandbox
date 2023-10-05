@@ -8,18 +8,18 @@ kaleidoscope::Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
 kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   using TokenType = Token::TokenType;
   // Initial read
-  lastCharacter = reader->nextChar();
+  lastCharacter = reader->nextCharacter();
 
   // Skip spacing characters
   while (std::isspace(lastCharacter)) {
-    lastCharacter = reader->nextChar();
+    lastCharacter = reader->nextCharacter();
   }
 
   std::string identifier;
   // [aA-zZ][aA-zZ0-9]*
   if (std::isalpha(lastCharacter)) {
     identifier += lastCharacter;
-    while (std::isalnum(lastCharacter = reader->nextChar())) {
+    while (std::isalnum(lastCharacter = reader->nextCharacter())) {
       identifier += lastCharacter;
     }
 
