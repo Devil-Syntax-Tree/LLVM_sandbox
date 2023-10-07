@@ -2,13 +2,7 @@
 
 #include <iostream>
 
-char kaleidoscope::ConsoleReader::nextChar() {
-    if (hasBufferedChar) {
-        hasBufferedChar = false;
-        return buffer;
-    }
-    return std::cin.get();
-}
+char kaleidoscope::ConsoleReader::nextCharacter() { return std::cin.get(); }
 
 char kaleidoscope::ConsoleReader::peekNextChar() {
     if (!hasBufferedChar) {

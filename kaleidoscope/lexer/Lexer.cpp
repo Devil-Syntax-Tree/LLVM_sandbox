@@ -10,24 +10,32 @@ double kaleidoscope::Lexer::getValNum() { return valNum; }
 
 kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   using TokenType = Token::TokenType;
-  int lastCharacter = ' ';
 
-  while (isspace(lastCharacter)) { // ignora espacios
-    lastCharacter = reader->nextChar();
+  char currentCharacter;
+  if (pendingCharacter.has_value()) {
+    currentCharacter = pendingCharacter.value();
+    pendingCharacter.reset();
+  } else {
+    currentCharacter = reader->nextCharacter();
   }
 
-  // reconocer identificadores -> [aA-zZ][aA-zZ0-9]*
-  if (isalpha(lastCharacter)) { // isalpha() revisa si el primer carácter es
-                                // letra (min o may)
-    identifierStr = lastCharacter;
-    while (isalnum(reader->peekNextChar())) { // isalnum() revisa que luego haya
-                                              // letras o números
-      lastCharacter = reader->nextChar();
-      identifierStr += lastCharacter;
+  // Skip spacing characters
+  while (std::isspace(currentCharacter)) {
+    currentCharacter = reader->nextCharacter();
+  }
+
+  std::string identifier;
+  // [aA-zZ][aA-zZ0-9]*
+  if (std::isalpha(currentCharacter)) {
+    identifier += currentCharacter;
+    while (std::isalnum(currentCharacter = reader->nextCharacter())) {
+      identifier += currentCharacter;
     }
 
-    if (identifierStr == "def") {
-      return {TokenType::DEF, identifierStr};
+    pendingCharacter = currentCharacter;
+
+    if (identifier == "def") {
+      return {TokenType::DEF, identifier};
     }
     if (identifierStr == "extern") {
       return {TokenType::EXTERN, identifierStr};
@@ -45,59 +53,57 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     return {TokenType::ID, identifierStr};
   }
 
-  // reconocer números -> [0-9.]+
-  if (isdigit(lastCharacter) || lastCharacter == '.') {
-    std::string numStr;
-    numStr += lastCharacter;
-    while (isdigit(reader->peekNextChar()) || reader->peekNextChar() == '.') {
-      lastCharacter = reader->nextChar();
-      numStr += lastCharacter;
-    }
+  // [0-9.]+
+  if (isdigit(currentCharacter) || currentCharacter == '.') {
+    std::string doubleRepresentation;
+    do {
+      doubleRepresentation += currentCharacter;
+      currentCharacter = reader->nextCharacter();
+    } while (isdigit(currentCharacter) || currentCharacter == '.');
 
-    valNum = strtod(numStr.c_str(), 0);
-    return {TokenType::NUMBER, numStr};
+    pendingCharacter = currentCharacter;
+
+    auto literalValue = std::stod(doubleRepresentation);
+    return {TokenType::NUMBER, "DOUBLE_NUMBER", literalValue};
   }
 
-  // reconocer símbolos
-  if (lastCharacter == '=') {
-    return {TokenType::ASSIGN, std::string(1, lastCharacter)};
+  std::string characterRepresentation(1, currentCharacter);
+
+  if (currentCharacter == '=') {
+    return {TokenType::ASSIGN, characterRepresentation};
   }
-  if (lastCharacter == '+') {
-    return {TokenType::SUM, std::string(1, lastCharacter)};
+  if (currentCharacter == '+') {
+    return {TokenType::SUM, characterRepresentation};
   }
-  if (lastCharacter == '-') {
-    return {TokenType::MINUS, std::string(1, lastCharacter)};
+  if (currentCharacter == '-') {
+    return {TokenType::MINUS, characterRepresentation};
   }
-  if (lastCharacter == '*') {
-    return {TokenType::MULT, std::string(1, lastCharacter)};
+  if (currentCharacter == '*') {
+    return {TokenType::MULT, characterRepresentation};
   }
-  if (lastCharacter == '/') {
-    return {TokenType::DIV, std::string(1, lastCharacter)};
+  if (currentCharacter == '/') {
+    return {TokenType::DIV, characterRepresentation};
   }
-  if (lastCharacter == '<') {
-    return {TokenType::LESS, std::string(1, lastCharacter)};
+  if (currentCharacter == '<') {
+    return {TokenType::LESS, characterRepresentation};
   }
-  if (lastCharacter == '>') {
-    return {TokenType::GREATER, std::string(1, lastCharacter)};
+  if (currentCharacter == '>') {
+    return {TokenType::GREATER, characterRepresentation};
   }
-  if (lastCharacter == '(') {
-    return {TokenType::LEFT_PARENTHESES, std::string(1, lastCharacter)};
+  if (currentCharacter == '(') {
+    return {TokenType::LEFT_PARENTHESES, characterRepresentation};
   }
-  if (lastCharacter == ')') {
-    return {TokenType::RIGHT_PARENTHESES, std::string(1, lastCharacter)};
+  if (currentCharacter == ')') {
+    return {TokenType::RIGHT_PARENTHESES, characterRepresentation};
   }
   if (lastCharacter == ',') {
     return {TokenType::COMMA, std::string(1, lastCharacter)};
   }
 
-  // reconocer EOF
-  if (lastCharacter == EOF) {
+  if (currentCharacter == EOF) {
     return {TokenType::END_OF_FILE, "EOF"};
   }
 
-  // caso para símbolos extraños... realmente, esto no debería existir...
-  // en todo caso, retorna su código ASCII
-  // int thisCharacter = lastCharacter;
-  lastCharacter = reader->nextChar();
-  return {TokenType::UNKNOWN, std::string(1, lastCharacter)};
+  // wildcard
+  return {TokenType::UNKNOWN, std::string(1, currentCharacter)};
 }
