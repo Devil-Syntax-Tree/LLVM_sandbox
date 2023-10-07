@@ -1,10 +1,9 @@
 #pragma once
 
-#include <optional>
 #include <memory>
+#include <optional>
 
-#include "../lexer/Token.hpp"
-#include "../reader/Reader.hpp"
+#include "Token.hpp"
 
 namespace kaleidoscope {
 class Reader;

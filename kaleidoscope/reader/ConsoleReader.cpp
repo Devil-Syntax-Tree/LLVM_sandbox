@@ -1,13 +1,5 @@
-#include "ConsoleReader.hpp"
-
 #include <iostream>
 
-char kaleidoscope::ConsoleReader::nextCharacter() { return std::cin.get(); }
+#include "ConsoleReader.hpp"
 
-char kaleidoscope::ConsoleReader::peekNextChar() {
-    if (!hasBufferedChar) {
-        buffer = std::cin.get();
-        hasBufferedChar = true;
-    }
-    return buffer;
-}
+char kaleidoscope::ConsoleReader::nextCharacter() { return std::cin.get(); }

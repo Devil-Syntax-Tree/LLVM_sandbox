@@ -1,12 +1,7 @@
-#include "../lexer/Lexer.hpp"
-#include "../lexer/Token.hpp"
+#include "Lexer.hpp"
 #include "../reader/Reader.hpp"
 
 kaleidoscope::Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
-
-std::string kaleidoscope::Lexer::getIdentifierStr() { return identifierStr; }
-
-double kaleidoscope::Lexer::getValNum() { return valNum; }
 
 kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   using TokenType = Token::TokenType;
@@ -37,20 +32,20 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     if (identifier == "def") {
       return {TokenType::DEF, identifier};
     }
-    if (identifierStr == "extern") {
-      return {TokenType::EXTERN, identifierStr};
+    if (identifier == "extern") {
+      return {TokenType::EXTERN, identifier};
     }
-    if (identifierStr == "if") {
-      return {TokenType::IF, identifierStr};
+    if (identifier == "if") {
+      return {TokenType::IF, identifier};
     }
-    if (identifierStr == "then") {
-      return {TokenType::THEN, identifierStr};
+    if (identifier == "then") {
+      return {TokenType::THEN, identifier};
     }
-    if (identifierStr == "else") {
-      return {TokenType::ELSE, identifierStr};
+    if (identifier == "else") {
+      return {TokenType::ELSE, identifier};
     }
 
-    return {TokenType::ID, identifierStr};
+    return {TokenType::ID, identifier};
   }
 
   // [0-9.]+
@@ -96,8 +91,11 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   if (currentCharacter == ')') {
     return {TokenType::RIGHT_PARENTHESES, characterRepresentation};
   }
-  if (lastCharacter == ',') {
-    return {TokenType::COMMA, std::string(1, lastCharacter)};
+  if (currentCharacter == ';') {
+    return {TokenType::COMMA, characterRepresentation};
+  }
+  if (currentCharacter == ',') {
+    return {TokenType::COMMA, characterRepresentation};
   }
 
   if (currentCharacter == EOF) {
@@ -105,5 +103,5 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   }
 
   // wildcard
-  return {TokenType::UNKNOWN, std::string(1, currentCharacter)};
+  return {TokenType::UNKNOWN, characterRepresentation};
 }

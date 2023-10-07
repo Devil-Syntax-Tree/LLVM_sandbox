@@ -41,6 +41,8 @@ std::string kaleidoscope::to_string(Token::TokenType value) {
     return "LESS"s;
   case TokenType::GREATER:
     return "GREATER"s;
+  case TokenType::SEMICOLON:
+    return "SEMICOLON"s;
   case TokenType::COMMA:
     return "COMMA"s;
   default:

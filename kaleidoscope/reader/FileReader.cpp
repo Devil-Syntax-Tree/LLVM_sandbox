@@ -1,6 +1,6 @@
-#include "FileReader.hpp"
+#include <exception>
 
-#include "exception"
+#include "FileReader.hpp"
 
 kaleidoscope::FileReader::FileReader(std::filesystem::path path) : file{path} {
   if (!file.is_open()) {
