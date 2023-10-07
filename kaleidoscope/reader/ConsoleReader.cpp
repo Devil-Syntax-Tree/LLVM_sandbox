@@ -2,4 +2,4 @@
 
 #include <iostream>
 
-char kaleidoscope::ConsoleReader::nextChar() { return std::cin.get(); }
+char kaleidoscope::ConsoleReader::nextCharacter() { return std::cin.get(); }
