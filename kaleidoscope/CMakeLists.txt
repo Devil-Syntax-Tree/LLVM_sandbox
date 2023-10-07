@@ -1,5 +1,4 @@
-add_library(kaleidoscope_base INTERFACE)
-
+add_library (kaleidoscope_base INTERFACE)
 set_target_properties (kaleidoscope_base PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
@@ -22,14 +21,15 @@ target_sources (kaleidoscope_executable
     PRIVATE main.cpp
 )
 
-target_link_libraries(kaleidoscope_executable PRIVATE
+target_link_libraries (kaleidoscope_executable PRIVATE
     kaleidoscope_base
 )
 
-add_subdirectory(reader)
-add_subdirectory(lexer)
+add_subdirectory (reader)
+add_subdirectory (lexer)
 
 target_link_libraries(kaleidoscope_executable PRIVATE
     kaleidoscope_reader
     kaleidoscope_lexer
+    kaleidoscope_codegen
 )
