@@ -7,7 +7,7 @@ set_target_properties (kaleidoscope_reader PROPERTIES
 )
 
 target_sources (
-    kaleidoscope_executable PRIVATE
+    kaleidoscope_reader PRIVATE
     Reader.hpp
     ConsoleReader.hpp
     ConsoleReader.cpp
