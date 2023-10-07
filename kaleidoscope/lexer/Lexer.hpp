@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <memory>
 
 #include "Token.hpp"
@@ -13,6 +14,6 @@ public:
 
 private:
   std::unique_ptr<Reader> reader;
-  char lastCharacter;
+  std::optional<char> pendingCharacter;
 };
 } // namespace kaleidoscope
