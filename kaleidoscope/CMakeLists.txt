@@ -13,17 +13,14 @@ if (ipo_lto_supported)
     )
 endif ()
 
-llvm_map_components_to_libnames (llvm_kaleidoscope_required_libs core analysis scalaropts transformutils)
-
-target_link_libraries (kaleidoscope_executable PRIVATE ${llvm_kaleidoscope_required_libs})
-target_include_directories (kaleidoscope_executable PRIVATE ${LLVM_INCLUDE_DIRS})
-target_compile_definitions (kaleidoscope_executable PRIVATE ${LLVM_DEFINITIONS_LIST})
-
 target_sources (kaleidoscope_executable 
     PRIVATE main.cpp
 )
 
 add_subdirectory(reader)
 add_subdirectory(lexer)
-add_subdirectory(parser)
-add_subdirectory(codegen)
+
+target_link_libraries(kaleidoscope_executable PRIVATE
+    kaleidoscope_reader
+    kaleidoscope_lexer
+)
