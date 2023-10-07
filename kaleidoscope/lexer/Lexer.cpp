@@ -13,19 +13,19 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     currentCharacter = pendingCharacter.value();
     pendingCharacter.reset();
   } else {
-    currentCharacter = reader->nextChar();
+    currentCharacter = reader->nextCharacter();
   }
 
   // Skip spacing characters
   while (std::isspace(currentCharacter)) {
-    currentCharacter = reader->nextChar();
+    currentCharacter = reader->nextCharacter();
   }
 
   std::string identifier;
   // [aA-zZ][aA-zZ0-9]*
   if (std::isalpha(currentCharacter)) {
     identifier += currentCharacter;
-    while (std::isalnum(currentCharacter = reader->nextChar())) {
+    while (std::isalnum(currentCharacter = reader->nextCharacter())) {
       identifier += currentCharacter;
     }
 
@@ -55,7 +55,7 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
     std::string doubleRepresentation;
     do {
       doubleRepresentation += currentCharacter;
-      currentCharacter = reader->nextChar();
+      currentCharacter = reader->nextCharacter();
     } while (isdigit(currentCharacter) || currentCharacter == '.');
 
     pendingCharacter = currentCharacter;
