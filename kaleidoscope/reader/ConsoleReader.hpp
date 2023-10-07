@@ -5,6 +5,6 @@
 namespace kaleidoscope {
 class ConsoleReader : public Reader {
 public:
-  char nextChar();
+  char nextCharacter() override;
 };
 } // namespace kaleidoscope
