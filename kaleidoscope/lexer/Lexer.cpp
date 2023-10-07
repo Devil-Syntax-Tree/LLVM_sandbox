@@ -1,9 +1,11 @@
 #include "Lexer.hpp"
 #include "../reader/Reader.hpp"
 
-kaleidoscope::Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
+namespace kaleidoscope {
 
-kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
+Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
+
+Token Lexer::nextToken() {
   using TokenType = Token::TokenType;
 
   char currentCharacter;
@@ -105,3 +107,4 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   // wildcard
   return {TokenType::UNKNOWN, characterRepresentation};
 }
+} // namespace kaleidoscope

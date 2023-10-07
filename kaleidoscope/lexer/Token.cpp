@@ -1,6 +1,7 @@
 #include "Token.hpp"
 
-std::string kaleidoscope::to_string(Token::TokenType value) {
+namespace kaleidoscope {
+std::string to_string(Token::TokenType value) {
   using namespace std::string_literals;
   using TokenType = Token::TokenType;
 
@@ -49,3 +50,4 @@ std::string kaleidoscope::to_string(Token::TokenType value) {
     return "UNKNOWN"s;
   }
 }
+} // namespace kaleidoscope

@@ -2,4 +2,6 @@
 
 #include "ConsoleReader.hpp"
 
-char kaleidoscope::ConsoleReader::nextCharacter() { return std::cin.get(); }
+namespace kaleidoscope {
+char ConsoleReader::nextCharacter() { return std::cin.get(); }
+} // namespace kaleidoscope
