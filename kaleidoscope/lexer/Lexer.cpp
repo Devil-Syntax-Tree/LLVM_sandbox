@@ -2,13 +2,11 @@
 #include "../reader/Reader.hpp"
 
 namespace kaleidoscope {
+using TokenType = Token::TokenType;
 
 Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
 
 Token Lexer::nextToken() {
-  using TokenType = Token::TokenType;
-
-  char currentCharacter;
   if (pendingCharacter.has_value()) {
     currentCharacter = pendingCharacter.value();
     pendingCharacter.reset();
@@ -16,11 +14,36 @@ Token Lexer::nextToken() {
     currentCharacter = reader->nextCharacter();
   }
 
-  // Skip spacing characters
+  skipSpaces();
+
+  auto ckIdentifier{checkIdentifiers()};
+  if (ckIdentifier.has_value()) {
+    return ckIdentifier.value();
+  }
+
+  auto ckNumber{checkNumber()};
+  if (ckNumber.has_value()) {
+    return ckNumber.value();
+  }
+
+  auto ckSymbols{checkSymbols()};
+  if (ckSymbols.has_value()) {
+    return ckSymbols.value();
+  }
+
+  std::string characterRepresentation(1, currentCharacter);
+
+  // wildcard
+  return {TokenType::UNKNOWN, characterRepresentation};
+}
+
+void Lexer::skipSpaces() {
   while (std::isspace(currentCharacter)) {
     currentCharacter = reader->nextCharacter();
   }
+}
 
+std::optional<Token> kaleidoscope::Lexer::checkIdentifiers() {
   std::string identifier;
   // [aA-zZ][aA-zZ0-9]*
   if (std::isalpha(currentCharacter)) {
@@ -32,24 +55,28 @@ Token Lexer::nextToken() {
     pendingCharacter = currentCharacter;
 
     if (identifier == "def") {
-      return {TokenType::DEF, identifier};
+      return {{TokenType::DEF, identifier}};
     }
     if (identifier == "extern") {
-      return {TokenType::EXTERN, identifier};
+      return {{TokenType::EXTERN, identifier}};
     }
     if (identifier == "if") {
-      return {TokenType::IF, identifier};
+      return {{TokenType::IF, identifier}};
     }
     if (identifier == "then") {
-      return {TokenType::THEN, identifier};
+      return {{TokenType::THEN, identifier}};
     }
     if (identifier == "else") {
-      return {TokenType::ELSE, identifier};
+      return {{TokenType::ELSE, identifier}};
     }
 
-    return {TokenType::ID, identifier};
+    return {{TokenType::ID, identifier}};
   }
 
+  return {};
+}
+
+std::optional<Token> Lexer::checkNumber() {
   // [0-9.]+
   if (isdigit(currentCharacter) || currentCharacter == '.') {
     std::string doubleRepresentation;
@@ -61,50 +88,52 @@ Token Lexer::nextToken() {
     pendingCharacter = currentCharacter;
 
     auto literalValue = std::stod(doubleRepresentation);
-    return {TokenType::NUMBER, "DOUBLE_NUMBER", literalValue};
+    return {{TokenType::NUMBER, "DOUBLE_NUMBER", literalValue}};
   }
+  return {};
+}
 
+std::optional<Token> kaleidoscope::Lexer::checkSymbols() {
   std::string characterRepresentation(1, currentCharacter);
 
   if (currentCharacter == '=') {
-    return {TokenType::ASSIGN, characterRepresentation};
+    return {{TokenType::ASSIGN, characterRepresentation}};
   }
   if (currentCharacter == '+') {
-    return {TokenType::SUM, characterRepresentation};
+    return {{TokenType::SUM, characterRepresentation}};
   }
   if (currentCharacter == '-') {
-    return {TokenType::MINUS, characterRepresentation};
+    return {{TokenType::MINUS, characterRepresentation}};
   }
   if (currentCharacter == '*') {
-    return {TokenType::MULT, characterRepresentation};
+    return {{TokenType::MULT, characterRepresentation}};
   }
   if (currentCharacter == '/') {
-    return {TokenType::DIV, characterRepresentation};
+    return {{TokenType::DIV, characterRepresentation}};
   }
   if (currentCharacter == '<') {
-    return {TokenType::LESS, characterRepresentation};
+    return {{TokenType::LESS, characterRepresentation}};
   }
   if (currentCharacter == '>') {
-    return {TokenType::GREATER, characterRepresentation};
+    return {{TokenType::GREATER, characterRepresentation}};
   }
   if (currentCharacter == '(') {
-    return {TokenType::LEFT_PARENTHESES, characterRepresentation};
+    return {{TokenType::LEFT_PARENTHESES, characterRepresentation}};
   }
   if (currentCharacter == ')') {
-    return {TokenType::RIGHT_PARENTHESES, characterRepresentation};
+    return {{TokenType::RIGHT_PARENTHESES, characterRepresentation}};
   }
   if (currentCharacter == ';') {
-    return {TokenType::COMMA, characterRepresentation};
+    return {{TokenType::SEMICOLON, characterRepresentation}};
   }
   if (currentCharacter == ',') {
-    return {TokenType::COMMA, characterRepresentation};
+    return {{TokenType::COMMA, characterRepresentation}};
   }
 
   if (currentCharacter == EOF) {
-    return {TokenType::END_OF_FILE, "EOF"};
+    return {{TokenType::END_OF_FILE, "EOF"}};
   }
 
-  // wildcard
-  return {TokenType::UNKNOWN, characterRepresentation};
+  return {};
 }
 } // namespace kaleidoscope

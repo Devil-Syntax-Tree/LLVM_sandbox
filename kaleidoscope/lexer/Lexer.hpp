@@ -15,7 +15,13 @@ public:
   Token nextToken();
 
 private:
+  void skipSpaces();
+  std::optional<Token> checkIdentifiers();
+  std::optional <Token> checkNumber();
+  std::optional <Token> checkSymbols();
+
   std::unique_ptr<Reader> reader;
+  char currentCharacter;
   std::optional<char> pendingCharacter;
 };
 
