@@ -7,21 +7,29 @@ kaleidoscope::Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
 
 kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   using TokenType = Token::TokenType;
-  // Initial read
-  lastCharacter = reader->nextChar();
+
+  char currentCharacter;
+  if (pendingCharacter.has_value()) {
+    currentCharacter = pendingCharacter.value();
+    pendingCharacter.reset();
+  } else {
+    currentCharacter = reader->nextCharacter();
+  }
 
   // Skip spacing characters
-  while (std::isspace(lastCharacter)) {
-    lastCharacter = reader->nextChar();
+  while (std::isspace(currentCharacter)) {
+    currentCharacter = reader->nextCharacter();
   }
 
   std::string identifier;
   // [aA-zZ][aA-zZ0-9]*
-  if (std::isalpha(lastCharacter)) {
-    identifier += lastCharacter;
-    while (std::isalnum(lastCharacter = reader->nextChar())) {
-      identifier += lastCharacter;
+  if (std::isalpha(currentCharacter)) {
+    identifier += currentCharacter;
+    while (std::isalnum(currentCharacter = reader->nextCharacter())) {
+      identifier += currentCharacter;
     }
+
+    pendingCharacter = currentCharacter;
 
     if (identifier == "def") {
       return {TokenType::DEF, identifier};
@@ -43,49 +51,53 @@ kaleidoscope::Token kaleidoscope::Lexer::nextToken() {
   }
 
   // [0-9.]+
-  if (isdigit(lastCharacter) || lastCharacter == '.') {
+  if (isdigit(currentCharacter) || currentCharacter == '.') {
     std::string doubleRepresentation;
     do {
-      doubleRepresentation += lastCharacter;
-      lastCharacter = getchar();
-    } while (isdigit(lastCharacter) || lastCharacter == '.');
+      doubleRepresentation += currentCharacter;
+      currentCharacter = reader->nextCharacter();
+    } while (isdigit(currentCharacter) || currentCharacter == '.');
+
+    pendingCharacter = currentCharacter;
 
     auto literalValue = std::stod(doubleRepresentation);
     return {TokenType::NUMBER, "DOUBLE_NUMBER", literalValue};
   }
 
-  if (lastCharacter == '=') {
-    return {TokenType::ASSIGN, std::string(1, lastCharacter)};
+  std::string characterRepresentation(1, currentCharacter);
+
+  if (currentCharacter == '=') {
+    return {TokenType::ASSIGN, characterRepresentation};
   }
-  if (lastCharacter == '+') {
-    return {TokenType::SUM, std::string(1, lastCharacter)};
+  if (currentCharacter == '+') {
+    return {TokenType::SUM, characterRepresentation};
   }
-  if (lastCharacter == '-') {
-    return {TokenType::MINUS, std::string(1, lastCharacter)};
+  if (currentCharacter == '-') {
+    return {TokenType::MINUS, characterRepresentation};
   }
-  if (lastCharacter == '*') {
-    return {TokenType::MULT, std::string(1, lastCharacter)};
+  if (currentCharacter == '*') {
+    return {TokenType::MULT, characterRepresentation};
   }
-  if (lastCharacter == '/') {
-    return {TokenType::DIV, std::string(1, lastCharacter)};
+  if (currentCharacter == '/') {
+    return {TokenType::DIV, characterRepresentation};
   }
-  if (lastCharacter == '<') {
-    return {TokenType::LESS, std::string(1, lastCharacter)};
+  if (currentCharacter == '<') {
+    return {TokenType::LESS, characterRepresentation};
   }
-  if (lastCharacter == '>') {
-    return {TokenType::GREATER, std::string(1, lastCharacter)};
+  if (currentCharacter == '>') {
+    return {TokenType::GREATER, characterRepresentation};
   }
-  if (lastCharacter == '(') {
-    return {TokenType::LEFT_PARENTHESES, std::string(1, lastCharacter)};
+  if (currentCharacter == '(') {
+    return {TokenType::LEFT_PARENTHESES, characterRepresentation};
   }
-  if (lastCharacter == ')') {
-    return {TokenType::RIGHT_PARENTHESES, std::string(1, lastCharacter)};
+  if (currentCharacter == ')') {
+    return {TokenType::RIGHT_PARENTHESES, characterRepresentation};
   }
 
-  if (lastCharacter == EOF) {
+  if (currentCharacter == EOF) {
     return {TokenType::END_OF_FILE, "EOF"};
   }
 
   // wildcard
-  return {TokenType::UNKNOWN, std::string(1, lastCharacter)};
+  return {TokenType::UNKNOWN, std::string(1, currentCharacter)};
 }
