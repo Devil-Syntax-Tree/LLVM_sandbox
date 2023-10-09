@@ -14,7 +14,6 @@ if (ipo_lto_supported)
 endif ()
 
 llvm_map_components_to_libnames (llvm_sandbox_required_libs core)
-
 target_link_libraries (sandbox_executable PRIVATE ${llvm_sandbox_required_libs})
 target_include_directories (sandbox_executable PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_definitions (sandbox_executable PRIVATE ${LLVM_DEFINITIONS_LIST})

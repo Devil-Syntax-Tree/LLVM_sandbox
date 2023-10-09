@@ -3,13 +3,10 @@
 #include <memory>
 
 #include "lexer/Lexer.hpp"
-#include "reader/FileReader.hpp"
+#include "reader/ConsoleReader.hpp"
 
 int main() {
-  std::filesystem::path kaleidoscopeFile{
-      "/workspace/kaleidoscope/example/main.kl"};
-  kaleidoscope::Lexer lexer{
-      std::make_unique<kaleidoscope::FileReader>(kaleidoscopeFile)};
+  kaleidoscope::Lexer lexer{std::make_unique<kaleidoscope::ConsoleReader>()};
 
   auto run{true};
   while (run) {

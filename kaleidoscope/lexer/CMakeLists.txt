@@ -1,9 +1,7 @@
 add_library (kaleidoscope_lexer)
 
-set_target_properties (kaleidoscope_lexer PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
+target_link_libraries(kaleidoscope_lexer PRIVATE
+    kaleidoscope_base
 )
 
 target_sources (kaleidoscope_lexer PRIVATE

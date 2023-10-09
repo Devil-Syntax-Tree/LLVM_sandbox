@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <optional>
+#include <string>
 
 namespace kaleidoscope {
 struct Token {
@@ -24,6 +24,8 @@ struct Token {
     DIV,
     LESS,
     GREATER,
+    SEMICOLON,
+    COMMA,
     UNKNOWN
   };
 
