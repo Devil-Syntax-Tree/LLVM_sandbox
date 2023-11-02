@@ -1,20 +1,21 @@
 #pragma once
 
+#include "../reader/Reader.hpp"
+#include "../lexer/Lexer.hpp"
 #include "../lexer/Token.hpp"
-#include "../parser/AST.hpp"
 #include "../parser/Precedence.hpp"
+#include "../parser/AST.hpp"
+#include "../codegen/Codegen.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 
 namespace kaleidoscope {
-class Reader;
-class Lexer;
-class Precedence;
+
 class Parser {
 public:
-  Parser(std::unique_ptr<Lexer> lexer, std::unique_ptr<Precedence> precedence);
+  Parser(std::unique_ptr<Lexer> lexer, std::unique_ptr<Precedence> precedence, std::unique_ptr<Codegen> cn);
   ~Parser() = default;
   Token getNextToken();
   Token getCurTok();
@@ -31,11 +32,13 @@ public:
   std::unique_ptr<FunctionAST> parseDefinition();
   std::unique_ptr<PrototypeAST> parseExtern();
   std::unique_ptr<FunctionAST> parseTopLevelExpr();
+  void printToken(const kaleidoscope::Token& token);
   void parse();
 
 private:
   std::unique_ptr<Lexer> lexer;
   std::unique_ptr<Precedence> precedence;
+  std::unique_ptr<Codegen> codegen;
   Token curTok;
 };
 

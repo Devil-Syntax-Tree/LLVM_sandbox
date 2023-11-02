@@ -1,18 +1,20 @@
 #pragma once
 
+#include "../reader/Reader.hpp"
+#include "Token.hpp"
 #include <memory>
 #include <optional>
 
-#include "Token.hpp"
 
 namespace kaleidoscope {
-class Reader;
+
 class Lexer {
 public:
   Lexer(std::unique_ptr<Reader> reader);
   std::string getIdentifierStr();
   double getValNum();
   Token nextToken();
+  char getCurrentCharacter();
 
 private:
   void skipSpaces();
@@ -22,6 +24,8 @@ private:
 
   std::unique_ptr<Reader> reader;
   char currentCharacter;
+  std::string identifierStr;
+  double valNum;
   std::optional<char> pendingCharacter;
 };
 

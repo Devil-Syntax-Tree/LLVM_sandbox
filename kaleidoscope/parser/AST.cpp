@@ -1,5 +1,5 @@
-#include "AST.hpp"
 #include "../codegen/Codegen.hpp"
+#include "AST.hpp"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Verifier.h"
@@ -9,44 +9,49 @@
 #include <string>
 #include <vector>
 
-kaleidoscope::NumberExprAST::NumberExprAST(double val) : val(val) {}
+kaleidoscope::ExprAST::ExprAST(kaleidoscope::Codegen& codegen) : cn(codegen) {}
 
-kaleidoscope::VariableExprAST::VariableExprAST(const std::string &name) : name(name) {}
+kaleidoscope::NumberExprAST::NumberExprAST(double val, kaleidoscope::Codegen& codegen)
+    : ExprAST(codegen), val(val) {}
+
+kaleidoscope::VariableExprAST::VariableExprAST(const std::string &name, kaleidoscope::Codegen& codegen)
+    : ExprAST(codegen), name(name) {}
 
 kaleidoscope::BinaryExprAST::BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
-                             std::unique_ptr<ExprAST> RHS)
-    : op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
+                             std::unique_ptr<ExprAST> RHS, kaleidoscope::Codegen& codegen)
+    : ExprAST(codegen), op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 
 kaleidoscope::CallExprAST::CallExprAST(const std::string &callee,
-                         std::vector<std::unique_ptr<ExprAST>> args)
-    : callee(callee), args(std::move(args)) {}
+                         std::vector<std::unique_ptr<ExprAST>> args, kaleidoscope::Codegen& codegen)
+    : ExprAST(codegen), callee(callee), args(std::move(args)) {}
 
 kaleidoscope::PrototypeAST::PrototypeAST(const std::string &name,
-                           std::vector<std::string> args)
-    : name(name), args(std::move(args)) {}
+                           std::vector<std::string> args,
+                           kaleidoscope::Codegen& codegen)
+    : cn(codegen), name(name), args(std::move(args)) {}
 
 std::string kaleidoscope::PrototypeAST::getName() { return name; }
 
 kaleidoscope::FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
-                         std::unique_ptr<ExprAST> body)
-    : proto(std::move(proto)), body(std::move(body)) {}
+                         std::unique_ptr<ExprAST> body, kaleidoscope::Codegen& codegen)
+    : cn(codegen), proto(std::move(proto)), body(std::move(body)) {}
 
 // =============== //
 // Code Generation //
 // =============== //
 
-static std::unique_ptr<kaleidoscope::Codegen> cn;
+// static std::unique_ptr<kaleidoscope::Codegen> cn;
 
 llvm::Value *kaleidoscope::NumberExprAST::codegen() {
   // en LLVM IR, constantes numéricas se representan con ConstantFP
-  return ConstantFP::get(*Codegen::TheContext, llvm::APFloat(val));
+  return ConstantFP::get(*cn.TheContext, llvm::APFloat(val));
 }
 
 llvm::Value *kaleidoscope::VariableExprAST::codegen() {
   // buscar esta variable en la tabla de símbolos global
-  Value *v = Codegen::namedValues[name];
+  Value *v = cn.namedValues[name];
   if (!v) {
-    cn->logErrorV("Unknown variable name");
+    cn.logErrorV("Unknown variable name");
   }
 
   return v;
@@ -61,36 +66,36 @@ llvm::Value *kaleidoscope::BinaryExprAST::codegen() {
 
   switch (op) {
   case '+':
-    return Codegen::Builder->CreateFAdd(l, r, "addtmp");
+    return cn.Builder->CreateFAdd(l, r, "addtmp");
   case '-':
-    return Codegen::Builder->CreateFSub(l, r, "subtmp");
+    return cn.Builder->CreateFSub(l, r, "subtmp");
   case '*':
-    return Codegen::Builder->CreateFMul(l, r, "multmp");
+    return cn.Builder->CreateFMul(l, r, "multmp");
   case '/':
-    return Codegen::Builder->CreateFDiv(l, r, "divtmp");
+    return cn.Builder->CreateFDiv(l, r, "divtmp");
   case '<':
-    l = Codegen::Builder->CreateFCmpULT(l, r, "cmptmp");
-    return Codegen::Builder->CreateUIToFP(
-        l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
+    l = cn.Builder->CreateFCmpULT(l, r, "cmptmp");
+    return cn.Builder->CreateUIToFP(
+        l, Type::getDoubleTy(*cn.TheContext), "booltmp");
   case '>':
-    l = Codegen::Builder->CreateFCmpUGT(l, r, "cmptmp");
-    return Codegen::Builder->CreateUIToFP(
-        l, Type::getDoubleTy(*Codegen::TheContext), "booltmp");
+    l = cn.Builder->CreateFCmpUGT(l, r, "cmptmp");
+    return cn.Builder->CreateUIToFP(
+        l, Type::getDoubleTy(*cn.TheContext), "booltmp");
   default:
-    return cn->logErrorV("invalid binary operator");
+    return cn.logErrorV("invalid binary operator");
   }
 }
 
 llvm::Value *kaleidoscope::CallExprAST::codegen() {
   // busca el nombre de la función en la tabla de símbolos global
-  Function *calleeF = Codegen::TheModule->getFunction(callee);
+  Function *calleeF = cn.TheModule->getFunction(callee);
   if (!calleeF) {
-    return cn->logErrorV("unknwown function referenced");
+    return cn.logErrorV("unknwown function referenced");
   }
 
   // compara tamaño de lista de argumentos
   if (calleeF->arg_size() != args.size()) {
-    return cn->logErrorV("incorrect number of arguments in function call");
+    return cn.logErrorV("incorrect number of arguments in function call");
   }
 
   // toca tener, además, una secicón de comparación de tipo de dato de cada
@@ -104,16 +109,16 @@ llvm::Value *kaleidoscope::CallExprAST::codegen() {
     }
   }
 
-  return Codegen::Builder->CreateCall(calleeF, argsV, "calltmp");
+  return cn.Builder->CreateCall(calleeF, argsV, "calltmp");
 }
 
 llvm::Function *kaleidoscope::PrototypeAST::codegen() {
   // hace el tipo de la función -> crea un vector de "N" tipos double LLVM
   std::vector<Type *> doubles(args.size(),
-                              Type::getDoubleTy(*Codegen::TheContext));
+                              Type::getDoubleTy(*cn.TheContext));
 
   // crea una función que tiene como parámetro "N" doubles y retorna uno
-  FunctionType *ft = FunctionType::get(Type::getDoubleTy(*Codegen::TheContext),
+  FunctionType *ft = FunctionType::get(Type::getDoubleTy(*cn.TheContext),
                                        doubles, false);
 
   // se genera la función LLVM correspondiente
@@ -121,7 +126,7 @@ llvm::Function *kaleidoscope::PrototypeAST::codegen() {
       ft, Function::ExternalLinkage, // se refiere a que la función puede o no
                                      // ser definida en el módulo actual
       name,
-      Codegen::TheModule.get()); // registra el nombre nuevo
+      cn.TheModule.get()); // registra el nombre nuevo
 
   // nombres para los parámetros
   unsigned idx = 0;
@@ -134,7 +139,7 @@ llvm::Function *kaleidoscope::PrototypeAST::codegen() {
 
 llvm::Function *kaleidoscope::FunctionAST::codegen() {
   // revisa si hay una función existente de alguna otra declaración
-  Function *TheFunction = Codegen::TheModule->getFunction(proto->getName());
+  Function *TheFunction = cn.TheModule->getFunction(proto->getName());
 
   // asegurarse que no tenga cuerpo aún
   if (!TheFunction) {
@@ -146,24 +151,24 @@ llvm::Function *kaleidoscope::FunctionAST::codegen() {
   }
 
   if (!TheFunction->empty()) {
-    return (Function *)cn->logErrorV("function cannot be redefined.");
+    return (Function *)cn.logErrorV("function cannot be redefined.");
   }
 
   // crear un nuevo bloque básico para empezar la inserción
   //  -> la idea es ir "insertando" instrucciones a la función
   BasicBlock *BB =
-      BasicBlock::Create(*Codegen::TheContext, "entry", TheFunction);
-  Codegen::Builder->SetInsertPoint(BB);
+      BasicBlock::Create(*cn.TheContext, "entry", TheFunction);
+  cn.Builder->SetInsertPoint(BB);
 
   // guardar los parámetros de la función en el mapa namedValues
-  Codegen::namedValues.clear();
+  cn.namedValues.clear();
   for (auto &arg : TheFunction->args()) {
-    Codegen::namedValues[std::string(arg.getName())] = &arg;
+    cn.namedValues[std::string(arg.getName())] = &arg;
   }
 
   if (Value *retVal = body->codegen()) {
     // crea retorno de función (fin de función)
-    Codegen::Builder->CreateRet(retVal);
+    cn.Builder->CreateRet(retVal);
 
     // validar el código generado, revisar consistencia
     if (verifyFunction(*TheFunction, &errs())) {
@@ -172,7 +177,7 @@ llvm::Function *kaleidoscope::FunctionAST::codegen() {
     }
 
     // optimización de función
-    Codegen::TheFPM->run(*TheFunction);
+    cn.TheFPM->run(*TheFunction);
 
     return TheFunction;
   }

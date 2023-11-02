@@ -1,21 +1,22 @@
-#include "../parser/Parser.hpp"
 #include "../lexer/Lexer.hpp"
 #include "../lexer/Token.hpp"
-#include "../parser/AST.hpp"
 #include "../parser/Precedence.hpp"
+#include "../parser/Parser.hpp"
+#include "../parser/AST.hpp"
+#include "../codegen/Codegen.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <bits/stdc++.h>
 
-kaleidoscope::Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p)
-    : lexer{std::move(l)}, precedence{std::move(p)} {}
+kaleidoscope::Parser::Parser(std::unique_ptr<Lexer> l, std::unique_ptr<Precedence> p, std::unique_ptr<Codegen> cn)
+    : lexer{std::move(l)}, precedence{std::move(p)}, codegen{std::move(cn)} {}
 
 // adelantar al siguiente token
 kaleidoscope::Token kaleidoscope::Parser::getNextToken() {
   curTok = lexer->nextToken();
-  //std::cout << "valor token: " << curTok.value << std::endl;
+  // std::cout << "valor token: " << curTok.value << std::endl;
   return curTok;
 }
 
@@ -44,9 +45,11 @@ std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::logErrorP(cons
 // crea un nodo NumberExprAST, avanza el lexer al siguiente token
 // retorna.
 std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseNumberExpr() {
+  //auto valNum = getCurTok().literalValue;
   auto result = std::make_unique<NumberExprAST>(
-      lexer->getValNum()); // auto es para deducir el tipo de la variable
-
+      lexer->getValNum(),
+      *codegen); // auto es para deducir el tipo de la variable
+  // lexer->getValNum()
   getNextToken();
   return std::move(result);
 }
@@ -71,13 +74,14 @@ std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseParenExpr() {
 //   ::= identifier
 //   ::= identifier '(' expression* ')'
 std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseIdentifierExpr() {
+  // std::string idName = getCurTok().literalValue;
   std::string idName = lexer->getIdentifierStr();
-  
+
   getNextToken();
 
   // referencia a variable simple
   if (curTok.value != "(") {
-    return std::make_unique<VariableExprAST>(idName);
+    return std::make_unique<VariableExprAST>(idName, *codegen);
   }
 
   // llamadas
@@ -110,7 +114,7 @@ std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseIdentifierExpr
     getNextToken();
   }
 
-  return std::make_unique<CallExprAST>(idName, std::move(args));
+  return std::make_unique<CallExprAST>(idName, std::move(args), *codegen);
 }
 
 // primary
@@ -159,7 +163,7 @@ std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseBinOpRHS(int e
 
   while (true) { // sabemos que va a acabar cuando token inválidos son -1
                  // es decir, cuando no haya otro par [operador, expresión], acaba.
-    
+
     // si es un operador, encontrar la precedencia
     int tokPrec = precedence->getTokenPrecedence(curTok);
 
@@ -167,7 +171,7 @@ std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseBinOpRHS(int e
     if (tokPrec < exprPrec) {
       return LHS;
     }
-    
+
     char arr[curTok.value.length() + 1];
     strcpy(arr, curTok.value.c_str());
     char binOp = arr[0];
@@ -192,7 +196,7 @@ std::unique_ptr<kaleidoscope::ExprAST> kaleidoscope::Parser::parseBinOpRHS(int e
 
     // juntar LHS y RHS
     LHS =
-        std::make_unique<BinaryExprAST>(binOp, std::move(LHS), std::move(RHS));
+        std::make_unique<BinaryExprAST>(binOp, std::move(LHS), std::move(RHS), *codegen);
   }
 }
 
@@ -232,15 +236,19 @@ std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::parsePrototype
         return logErrorP("expected argument, maybe you forgot...");
       }
     }
+
+    if (curTok.value != ")" or curTok.value != ",") {
+      break;
+    }
   }
 
   if (curTok.value != ")") {
     return logErrorP("expected ')' in prototype");
   }
-  
+
   getNextToken(); // se come ')'
 
-  return std::make_unique<PrototypeAST>(fnName, std::move(argNames));
+  return std::make_unique<PrototypeAST>(fnName, std::move(argNames), *codegen);
 }
 
 // definition
@@ -258,7 +266,7 @@ std::unique_ptr<kaleidoscope::FunctionAST> kaleidoscope::Parser::parseDefinition
   }
 
   if (auto e = parseExpression()) {
-    return std::make_unique<FunctionAST>(std::move(proto), std::move(e));
+    return std::make_unique<FunctionAST>(std::move(proto), std::move(e), *codegen);
   }
 
   return nullptr;
@@ -276,8 +284,8 @@ std::unique_ptr<kaleidoscope::PrototypeAST> kaleidoscope::Parser::parseExtern() 
 std::unique_ptr<kaleidoscope::FunctionAST> kaleidoscope::Parser::parseTopLevelExpr() {
   if (auto e = parseExpression()) {
     // proto anónimo
-    auto proto = std::make_unique<PrototypeAST>("", std::vector<std::string>());
-    return std::make_unique<FunctionAST>(std::move(proto), std::move(e));
+    auto proto = std::make_unique<PrototypeAST>("", std::vector<std::string>(), *codegen);
+    return std::make_unique<FunctionAST>(std::move(proto), std::move(e), *codegen);
   }
 
   return nullptr;

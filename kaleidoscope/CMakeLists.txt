@@ -27,9 +27,14 @@ target_link_libraries (kaleidoscope_executable PRIVATE
 
 add_subdirectory (reader)
 add_subdirectory (lexer)
+add_subdirectory (parser)
+add_subdirectory (codegen)
+add_subdirectory (executor)
 
 target_link_libraries(kaleidoscope_executable PRIVATE
     kaleidoscope_reader
     kaleidoscope_lexer
-    kaleidoscope_codegen
+    kaleidoscope_parser
+    # kaleidoscope_codegen
+    kaleidoscope_executor
 )

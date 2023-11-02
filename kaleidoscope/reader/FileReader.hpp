@@ -6,7 +6,7 @@
 namespace kaleidoscope {
 class FileReader : public Reader {
 public:
-  FileReader(std::filesystem::path path);
+  FileReader(const std::string& path);
   char nextCharacter() override;
 
 private:

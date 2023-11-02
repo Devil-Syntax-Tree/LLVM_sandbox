@@ -1,20 +1,22 @@
 #pragma once
 
+#include "../codegen/Codegen.hpp"
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
-#include "llvm/IR/Value.h"
-#include "llvm/IR/Function.h"
+#include <llvm/IR/Value.h>
+#include <llvm/IR/Function.h>
 
 namespace kaleidoscope {
-  
+
 using namespace llvm;
 
 // clase base para todo nodo de expresión
 class ExprAST {
 public:
+  ExprAST(kaleidoscope::Codegen& codegen);
   virtual ~ExprAST() = default;
   // para tener en cuenta más adelante, esta clase debería tener un campo
   // de "tipo", para los tipos de datos según nodo...
@@ -24,6 +26,8 @@ public:
 
   // el mismo tuto recomienda no agregar esos métodos virtuales, sino usar algún
   // patrón como "Visitor Pattern" como alternativa.
+protected:
+  kaleidoscope::Codegen& cn;
 };
 
 // nodos para numerales, p.e. "1.0"
@@ -31,7 +35,7 @@ class NumberExprAST : public ExprAST {
   double val; // valor numérico
 
 public:
-  NumberExprAST(double val);
+  NumberExprAST(double val, kaleidoscope::Codegen& codegen);
   Value *codegen() override;
 };
 
@@ -40,7 +44,7 @@ class VariableExprAST : public ExprAST {
   std::string name;
 
 public:
-  VariableExprAST(const std::string &name);
+  VariableExprAST(const std::string &name, kaleidoscope::Codegen& codegen);
   Value *codegen() override;
 };
 
@@ -51,7 +55,8 @@ class BinaryExprAST : public ExprAST {
 
 public:
   BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
-                std::unique_ptr<ExprAST> RHS);
+                std::unique_ptr<ExprAST> RHS,
+                kaleidoscope::Codegen& codegen);
   Value *codegen() override;
 };
 
@@ -62,7 +67,8 @@ class CallExprAST : public ExprAST {
 
 public:
   CallExprAST(const std::string &callee,
-              std::vector<std::unique_ptr<ExprAST>> args);
+              std::vector<std::unique_ptr<ExprAST>> args,
+              kaleidoscope::Codegen& codegen);
   Value *codegen() override;
 };
 
@@ -70,9 +76,10 @@ public:
 class PrototypeAST {
   std::string name;
   std::vector<std::string> args;
+  kaleidoscope::Codegen& cn;
 
 public:
-  PrototypeAST(const std::string &name, std::vector<std::string> args);
+  PrototypeAST(const std::string &name, std::vector<std::string> args, kaleidoscope::Codegen& codegen);
   std::string getName();
   Function *codegen();
 };
@@ -81,10 +88,12 @@ public:
 class FunctionAST {
   std::unique_ptr<PrototypeAST> proto;
   std::unique_ptr<ExprAST> body;
+  kaleidoscope::Codegen& cn;
 
 public:
   FunctionAST(std::unique_ptr<PrototypeAST> proto,
-              std::unique_ptr<ExprAST> body);
+              std::unique_ptr<ExprAST> body,
+              kaleidoscope::Codegen& codegen);
   Function *codegen();
 };
 
