@@ -16,6 +16,9 @@ endif ()
 
 
 find_package (LLVM 17 CONFIG REQUIRED)
+include (AddLLVM)
+separate_arguments (LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 
 add_subdirectory (sandbox)
 add_subdirectory (kaleidoscope)
+add_subdirectory(ORC)
