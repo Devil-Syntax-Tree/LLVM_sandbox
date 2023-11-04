@@ -13,6 +13,9 @@ RUN apt update && apt upgrade -y \
     && echo "LANG=en_US.utf8" >> /etc/environment \
     && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
 
+
+RUN DEBIAN_FRONTEND=noninteractive apt install -y clang-format-17
+
 USER dev
 
 WORKDIR /workspace
