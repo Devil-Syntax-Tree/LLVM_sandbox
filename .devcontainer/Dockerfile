@@ -11,10 +11,8 @@ RUN apt update && apt upgrade -y \
     && useradd -g devgroup -m -s /bin/bash dev \
     && echo "dev ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && echo "LANG=en_US.utf8" >> /etc/environment \
-    && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
-
-
-RUN DEBIAN_FRONTEND=noninteractive apt install -y clang-format-17
+    && bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" \
+    && DEBIAN_FRONTEND=noninteractive apt install -y clang-format-17
 
 USER dev
 
