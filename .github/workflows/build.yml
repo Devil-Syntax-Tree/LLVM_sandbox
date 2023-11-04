@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4.1.1
       - name: Build sandbox
         uses: devcontainers/ci@v0.3
         with:
@@ -17,3 +17,14 @@ jobs:
             cmake --build --preset x64-linux-debug
             cmake --preset x64-linux-release
             cmake --build --preset x64-linux-release
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+      - name: Build sandbox
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            shopt -s globstar
+            clang-format-17 --dry-run --Werror **/*.cpp **/*.hpp
