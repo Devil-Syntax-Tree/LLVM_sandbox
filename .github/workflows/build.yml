@@ -27,4 +27,4 @@ jobs:
         with:
           runCmd: |
             shopt -s globstar
-            clang-format-17 --dry-run --Werror **/*.cpp **/*.hpp
+            clang-format-17 --dry-run --Werror **/*.c **/*.h **/*.cpp **/*.hpp
