@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../reader/Reader.hpp"
-#include "../lexer/Lexer.hpp"
-#include "../parser/Precedence.hpp"
-#include "../parser/Parser.hpp"
 #include "../codegen/Codegen.hpp"
-#include <fstream>
+#include "../lexer/Lexer.hpp"
+#include "../parser/Parser.hpp"
+#include "../parser/Precedence.hpp"
+#include "../reader/Reader.hpp"
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -15,7 +15,7 @@ namespace kaleidoscope {
 
 class Executor {
 public:
-  void initializeMembers(const std::string& file_root);
+  void initializeMembers(const std::string &file_root);
   void initializeModuleAndPassManager();
   void handleDefinition();
   void handleExtern();

@@ -1,28 +1,27 @@
 #include "Executor.hpp"
-#include "../reader/Reader.hpp"
+#include "../codegen/Codegen.hpp"
+#include "../lexer/Lexer.hpp"
+#include "../parser/Parser.hpp"
+#include "../parser/Precedence.hpp"
 #include "../reader/ConsoleReader.hpp"
 #include "../reader/FileReader.hpp"
-#include "../lexer/Lexer.hpp"
-#include "../parser/Precedence.hpp"
-#include "../parser/Parser.hpp"
-#include "../codegen/Codegen.hpp"
+#include "../reader/Reader.hpp"
 
-void kaleidoscope::Executor::initializeMembers(const std::string& file_root) {
-    // if (!file_root.empty()) {
-    //     reader = std::make_unique<kaleidoscope::FileReader>(file_root);
-    // } else {
-    //     reader = std::make_unique<kaleidoscope::ConsoleReader>();
-    // }
-    reader = std::make_unique<kaleidoscope::FileReader>(file_root);
-    lexer = std::make_unique<kaleidoscope::Lexer>(std::move(reader)); // Mover reader a lexer aquí
-    precedence = std::make_unique<kaleidoscope::Precedence>(0);
-    codegen = std::make_unique<kaleidoscope::Codegen>();
-    codegen->initializeModuleAndPassManager();
-    parser = std::make_unique<kaleidoscope::Parser>(
-        std::move(lexer),
-        std::move(precedence),
-        std::move(codegen)
-    ); // Mover lexer, precedence y codegen a parser aquí
+void kaleidoscope::Executor::initializeMembers(const std::string &file_root) {
+  // if (!file_root.empty()) {
+  //     reader = std::make_unique<kaleidoscope::FileReader>(file_root);
+  // } else {
+  //     reader = std::make_unique<kaleidoscope::ConsoleReader>();
+  // }
+  reader = std::make_unique<kaleidoscope::FileReader>(file_root);
+  lexer = std::make_unique<kaleidoscope::Lexer>(
+      std::move(reader)); // Mover reader a lexer aquí
+  precedence = std::make_unique<kaleidoscope::Precedence>(0);
+  codegen = std::make_unique<kaleidoscope::Codegen>();
+  codegen->initializeModuleAndPassManager();
+  parser = std::make_unique<kaleidoscope::Parser>(
+      std::move(lexer), std::move(precedence),
+      std::move(codegen)); // Mover lexer, precedence y codegen a parser aquí
 }
 
 void kaleidoscope::Executor::initializeModuleAndPassManager() {
@@ -72,7 +71,8 @@ void kaleidoscope::Executor::handleTopLevelExpression() {
 }
 
 void kaleidoscope::Executor::mainLoop() {
-  while (parser->getCurTok().type != kaleidoscope::Token::TokenType::END_OF_FILE) {
+  while (parser->getCurTok().type !=
+         kaleidoscope::Token::TokenType::END_OF_FILE) {
     switch (parser->getCurTok().type) {
     case kaleidoscope::Token::TokenType::END_OF_FILE:
       std::cout << "Success!" << std::endl;

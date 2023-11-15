@@ -28,7 +28,7 @@ Value *kaleidoscope::Codegen::logErrorV(const char *str) {
 
 void kaleidoscope::Codegen::initializeModuleAndPassManager() {
   initializeMembers();
-  //TheModule->setDataLayout(TheJIT->getDataLayout());
+  // TheModule->setDataLayout(TheJIT->getDataLayout());
 
   // passes de optimización:
 

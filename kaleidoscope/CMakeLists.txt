@@ -35,6 +35,6 @@ target_link_libraries(kaleidoscope_executable PRIVATE
     kaleidoscope_reader
     kaleidoscope_lexer
     kaleidoscope_parser
-    # kaleidoscope_codegen
+    kaleidoscope_codegen
     kaleidoscope_executor
 )
