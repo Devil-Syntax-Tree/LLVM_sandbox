@@ -1,5 +1,5 @@
-#include "../codegen/Codegen.hpp"
 #include "AST.hpp"
+#include "../codegen/Codegen.hpp"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Verifier.h"
@@ -9,31 +9,37 @@
 #include <string>
 #include <vector>
 
-kaleidoscope::ExprAST::ExprAST(kaleidoscope::Codegen& codegen) : cn(codegen) {}
+kaleidoscope::ExprAST::ExprAST(kaleidoscope::Codegen &codegen) : cn(codegen) {}
 
-kaleidoscope::NumberExprAST::NumberExprAST(double val, kaleidoscope::Codegen& codegen)
+kaleidoscope::NumberExprAST::NumberExprAST(double val,
+                                           kaleidoscope::Codegen &codegen)
     : ExprAST(codegen), val(val) {}
 
-kaleidoscope::VariableExprAST::VariableExprAST(const std::string &name, kaleidoscope::Codegen& codegen)
+kaleidoscope::VariableExprAST::VariableExprAST(const std::string &name,
+                                               kaleidoscope::Codegen &codegen)
     : ExprAST(codegen), name(name) {}
 
-kaleidoscope::BinaryExprAST::BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
-                             std::unique_ptr<ExprAST> RHS, kaleidoscope::Codegen& codegen)
+kaleidoscope::BinaryExprAST::BinaryExprAST(char op,
+                                           std::unique_ptr<ExprAST> LHS,
+                                           std::unique_ptr<ExprAST> RHS,
+                                           kaleidoscope::Codegen &codegen)
     : ExprAST(codegen), op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 
-kaleidoscope::CallExprAST::CallExprAST(const std::string &callee,
-                         std::vector<std::unique_ptr<ExprAST>> args, kaleidoscope::Codegen& codegen)
+kaleidoscope::CallExprAST::CallExprAST(
+    const std::string &callee, std::vector<std::unique_ptr<ExprAST>> args,
+    kaleidoscope::Codegen &codegen)
     : ExprAST(codegen), callee(callee), args(std::move(args)) {}
 
 kaleidoscope::PrototypeAST::PrototypeAST(const std::string &name,
-                           std::vector<std::string> args,
-                           kaleidoscope::Codegen& codegen)
+                                         std::vector<std::string> args,
+                                         kaleidoscope::Codegen &codegen)
     : cn(codegen), name(name), args(std::move(args)) {}
 
 std::string kaleidoscope::PrototypeAST::getName() { return name; }
 
 kaleidoscope::FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto,
-                         std::unique_ptr<ExprAST> body, kaleidoscope::Codegen& codegen)
+                                       std::unique_ptr<ExprAST> body,
+                                       kaleidoscope::Codegen &codegen)
     : cn(codegen), proto(std::move(proto)), body(std::move(body)) {}
 
 // =============== //
@@ -75,12 +81,12 @@ llvm::Value *kaleidoscope::BinaryExprAST::codegen() {
     return cn.Builder->CreateFDiv(l, r, "divtmp");
   case '<':
     l = cn.Builder->CreateFCmpULT(l, r, "cmptmp");
-    return cn.Builder->CreateUIToFP(
-        l, Type::getDoubleTy(*cn.TheContext), "booltmp");
+    return cn.Builder->CreateUIToFP(l, Type::getDoubleTy(*cn.TheContext),
+                                    "booltmp");
   case '>':
     l = cn.Builder->CreateFCmpUGT(l, r, "cmptmp");
-    return cn.Builder->CreateUIToFP(
-        l, Type::getDoubleTy(*cn.TheContext), "booltmp");
+    return cn.Builder->CreateUIToFP(l, Type::getDoubleTy(*cn.TheContext),
+                                    "booltmp");
   default:
     return cn.logErrorV("invalid binary operator");
   }
@@ -114,12 +120,11 @@ llvm::Value *kaleidoscope::CallExprAST::codegen() {
 
 llvm::Function *kaleidoscope::PrototypeAST::codegen() {
   // hace el tipo de la función -> crea un vector de "N" tipos double LLVM
-  std::vector<Type *> doubles(args.size(),
-                              Type::getDoubleTy(*cn.TheContext));
+  std::vector<Type *> doubles(args.size(), Type::getDoubleTy(*cn.TheContext));
 
   // crea una función que tiene como parámetro "N" doubles y retorna uno
-  FunctionType *ft = FunctionType::get(Type::getDoubleTy(*cn.TheContext),
-                                       doubles, false);
+  FunctionType *ft =
+      FunctionType::get(Type::getDoubleTy(*cn.TheContext), doubles, false);
 
   // se genera la función LLVM correspondiente
   Function *f = Function::Create(
@@ -156,8 +161,7 @@ llvm::Function *kaleidoscope::FunctionAST::codegen() {
 
   // crear un nuevo bloque básico para empezar la inserción
   //  -> la idea es ir "insertando" instrucciones a la función
-  BasicBlock *BB =
-      BasicBlock::Create(*cn.TheContext, "entry", TheFunction);
+  BasicBlock *BB = BasicBlock::Create(*cn.TheContext, "entry", TheFunction);
   cn.Builder->SetInsertPoint(BB);
 
   // guardar los parámetros de la función en el mapa namedValues

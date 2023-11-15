@@ -9,8 +9,7 @@ public:
 };
 } // namespace kaleidoscope
 
-// #ifndef READER_HPP
-// #define READER_HPP
+// #pragma once
 
 // #include <string>
 // #include <fstream>
@@ -36,5 +35,3 @@ public:
 // };
 
 // } // namespace kaleidoscope
-
-// #endif // READER_HPP

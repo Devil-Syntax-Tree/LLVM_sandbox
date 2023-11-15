@@ -99,7 +99,7 @@ public:
   }
 };
 
-}
-}
+} // namespace orc
+} // namespace llvm
 
 #endif // LLVM_EXECUTIONENGINE_ORC_KALEIDOSCOPEJIT_H

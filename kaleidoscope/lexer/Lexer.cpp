@@ -2,6 +2,7 @@
 #include "../reader/Reader.hpp"
 
 namespace kaleidoscope {
+
 using TokenType = Token::TokenType;
 
 Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
