@@ -7,7 +7,6 @@
 #include "parser/Parser.hpp"
 #include "reader/ConsoleReader.hpp"
 #include "reader/FileReader.hpp"
-#include "executor/Executor.hpp"
 
 int main() {
 
@@ -36,32 +35,25 @@ int main() {
   // PRUEBA INDIVIDUAL PARSER //
   // ======================== //
 
-  // kaleidoscope::Lexer lexer(
-  //     std::make_unique<kaleidoscope::FileReader>("./kaleidoscope/examples/test_kaleidoscope.txt"));
+  kaleidoscope::Lexer lexer(
+      std::make_unique<kaleidoscope::FileReader>("./kaleidoscope/examples/test_kaleidoscope.txt"));
 
-  // kaleidoscope::Precedence precedence(0);
-  // kaleidoscope::Parser parser(std::make_unique<kaleidoscope::Lexer>(std::make_unique<kaleidoscope::FileReader>(
-  //                   "./kaleidoscope/examples/test_kaleidoscope.txt")),
-  //               std::make_unique<kaleidoscope::Precedence>(precedence));
+  kaleidoscope::Precedence precedence(0);
+  std::unique_ptr<kaleidoscope::Codegen> codegen = std::make_unique<kaleidoscope::Codegen>();
+  codegen->initializeModuleAndPassManager();
+  kaleidoscope::Parser parser(std::make_unique<kaleidoscope::Lexer>(std::make_unique<kaleidoscope::FileReader>(
+                    "./kaleidoscope/examples/test_kaleidoscope.txt")),
+                std::make_unique<kaleidoscope::Precedence>(precedence),
+                std::move(codegen));
 
-  // kaleidoscope::Token tok({kaleidoscope::Token::TokenType::INIT, ""});
-  // parser.getNextToken();
-  // while (tok.type != kaleidoscope::Token::TokenType::END_OF_FILE) {
-  //   tok = lexer.nextToken();
-  //   parser.parse();
-  // }
+  kaleidoscope::Token tok({kaleidoscope::Token::TokenType::INIT, ""});
+  parser.getNextToken();
+  while (tok.type != kaleidoscope::Token::TokenType::END_OF_FILE) {
+    tok = lexer.nextToken();
+    parser.parse();
+  }
 
-  // std::cout << "Success!" << std::endl;
-
-  // ===================== //
-  // PRUEBA TOTAL EXECUTOR //
-  // ===================== //
-
-  kaleidoscope::Executor executor;
-  executor.initializeMembers("./kaleidoscope/examples/test_kaleidoscope.txt"); //
-  executor.initializeModuleAndPassManager();
-  executor.mainLoop();
-
+  std::cout << "Success!" << std::endl;
 
   return 0;
 }
