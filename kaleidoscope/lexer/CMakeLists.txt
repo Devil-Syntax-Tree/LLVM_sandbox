@@ -2,6 +2,7 @@ add_library (kaleidoscope_lexer)
 
 target_link_libraries(kaleidoscope_lexer PRIVATE
     kaleidoscope_base
+    LLVMCore
 )
 
 target_sources (kaleidoscope_lexer PRIVATE

@@ -2,9 +2,14 @@
 #include "../reader/Reader.hpp"
 
 namespace kaleidoscope {
+
 using TokenType = Token::TokenType;
 
 Lexer::Lexer(std::unique_ptr<Reader> r) : reader{std::move(r)} {}
+
+std::string Lexer::getIdentifierStr() { return identifierStr; }
+
+double Lexer::getValNum() { return valNum; }
 
 Token Lexer::nextToken() {
   if (pendingCharacter.has_value()) {
@@ -70,6 +75,7 @@ std::optional<Token> kaleidoscope::Lexer::checkIdentifiers() {
       return {{TokenType::ELSE, identifier}};
     }
 
+    identifierStr = identifier;
     return {{TokenType::ID, identifier}};
   }
 
@@ -88,6 +94,7 @@ std::optional<Token> Lexer::checkNumber() {
     pendingCharacter = currentCharacter;
 
     auto literalValue = std::stod(doubleRepresentation);
+    valNum = literalValue;
     return {{TokenType::NUMBER, "DOUBLE_NUMBER", literalValue}};
   }
   return {};

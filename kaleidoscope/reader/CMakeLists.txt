@@ -7,8 +7,8 @@ target_link_libraries(kaleidoscope_reader PRIVATE
 target_sources (
     kaleidoscope_reader PRIVATE
     Reader.hpp
-    ConsoleReader.hpp
-    ConsoleReader.cpp
     FileReader.hpp
     FileReader.cpp
+    ConsoleReader.hpp
+    ConsoleReader.cpp
 )
