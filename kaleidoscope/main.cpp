@@ -92,7 +92,6 @@ int main() {
     parser.parse();
   }
 
-
   std::cout << "Success!" << std::endl;
 
   return 0;
